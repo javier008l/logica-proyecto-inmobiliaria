@@ -5,10 +5,10 @@ const config = {
   name: 'mysql',
   connector: 'mysql',
   url: '',
-  host: 'localhost',
+  host: 'inmobiliaria.cinx5ri9pjfj.us-east-2.rds.amazonaws.com',
   port: 3306,
-  user: 'root',
-  password: '1234',
+  user: 'admin',
+  password: '7yvf4ge7CS3b8u',
   database: 'inmobiliariadb'
 };
 
