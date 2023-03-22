@@ -8,7 +8,7 @@ const config = {
   host: 'localhost',
   port: 3306,
   user: 'root',
-  password: '1002857145',
+  password: '1234',
   database: 'inmobiliariadb'
 };
 
