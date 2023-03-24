@@ -1,8 +1,25 @@
-import {Entity, model, property, belongsTo} from '@loopback/repository';
-import {TipoInmueble} from './tipo-inmueble.model';
+import {belongsTo, Entity, model, property} from '@loopback/repository';
 import {Ciudad} from './ciudad.model';
+import {TipoInmueble} from './tipo-inmueble.model';
 
-@model()
+@model({
+  settings: {
+    foreignKeys: {
+      fk_inmueble_tipo_inmueble_idTipoInmueble: {
+        name: 'fk_inmueble_tipo_inmueble_idTipoInmueble',
+        entity: 'TipoInmueble',
+        entityKey: 'id',
+        foreignKey: 'tipoInmuebleId',
+      },
+      fk_inmueble_idCiudad: {
+        name: 'fk_inmueble_idCiudad',
+        entity: 'Ciudad',
+        entityKey: 'id',
+        foreignKey: 'ciudadId',
+      },
+    },
+  },
+})
 export class Inmueble extends Entity {
   @property({
     type: 'number',

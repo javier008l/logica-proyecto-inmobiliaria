@@ -1,12 +1,53 @@
-import {Entity, model, property, hasMany, belongsTo} from '@loopback/repository';
-import {Estado} from './estado.model';
-import {Cliente} from './cliente.model';
+import {
+  belongsTo,
+  Entity,
+  hasMany,
+  model,
+  property,
+} from '@loopback/repository';
 import {Asesor} from './asesor.model';
+import {Cliente} from './cliente.model';
 import {Codeudor} from './codeudor.model';
-import {TipoSolicitud} from './tipo-solicitud.model';
+import {Estado} from './estado.model';
 import {TipoInmueble} from './tipo-inmueble.model';
+import {TipoSolicitud} from './tipo-solicitud.model';
 
-@model()
+@model({
+  settings: {
+    foreignKeys: {
+      fk_solicitud_idCliente: {
+        name: 'fk_solicitud_idCliente',
+        entity: 'Cliente',
+        entityKey: 'id',
+        foreignKey: 'clienteId',
+      },
+      fk_solicitud_idAsesor: {
+        name: 'fk_solicitud_idAsesor',
+        entity: 'Asesor',
+        entityKey: 'id',
+        foreignKey: 'asesorId',
+      },
+      fk_solicitud_idCodeudor: {
+        name: 'fk_solicitud_idCodeudor',
+        entity: 'Codeudor',
+        entityKey: 'id',
+        foreignKey: 'codeudorId',
+      },
+      fk_solicitud_tipo_solicitud_idTipoSolicitud: {
+        name: 'fk_solicitud_tipo_solicitud_idTipoSolicitud',
+        entity: 'TipoSolicitud',
+        entityKey: 'id',
+        foreignKey: 'tipoSolicitudId',
+      },
+      fk_solicitud_tipo_inmueble_idTipoInmueble: {
+        name: 'fk_solicitud_tipo_inmueble_idTipoInmueble',
+        entity: 'TipoInmueble',
+        entityKey: 'id',
+        foreignKey: 'tipoInmuebleId',
+      },
+    },
+  },
+})
 export class Solicitud extends Entity {
   @property({
     type: 'number',
