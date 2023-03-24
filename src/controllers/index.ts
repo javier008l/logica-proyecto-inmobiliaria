@@ -32,3 +32,4 @@ export * from './tipo-inmueble.controller';
 export * from './inmuebles.controller';
 export * from './ciudad.controller';
 export * from './departamento.controller';
+export * from './administrador-de-archivos.controller';
