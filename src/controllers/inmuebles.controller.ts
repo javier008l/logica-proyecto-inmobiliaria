@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {
   Count,
   CountSchema,
@@ -17,6 +18,7 @@ import {
   requestBody,
   response,
 } from '@loopback/rest';
+import {ConfiguracionSeguridad} from '../config/configuracion.seguridad';
 import {Inmueble} from '../models';
 import {InmuebleRepository} from '../repositories';
 
@@ -57,7 +59,10 @@ export class InmueblesController {
   ): Promise<Count> {
     return this.inmuebleRepository.count(where);
   }
-
+  @authenticate({
+    strategy: "auth",
+    options: [ConfiguracionSeguridad.menuInmuebleUsuarioId, ConfiguracionSeguridad.listarAccion]
+  })
   @get('/inmueble')
   @response(200, {
     description: 'Array of Inmueble model instances',
