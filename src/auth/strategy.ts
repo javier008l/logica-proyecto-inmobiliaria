@@ -1,8 +1,10 @@
 import {AuthenticationBindings, AuthenticationMetadata, AuthenticationStrategy} from '@loopback/authentication';
 import {inject} from '@loopback/context';
+import {HttpErrors, Request} from '@loopback/rest';
 import {UserProfile} from '@loopback/security';
-import {HttpErrors,Request} from '@loopback/rest';
 import parseBearerToken from 'parse-bearer-token';
+import {ConfiguracionSeguridad} from '../config/configuracion.seguridad';
+const fetch = require('node-fetch');
 // import {Request} from '@loopback/rest';
 
 export class AuthStrategy implements AuthenticationStrategy {
@@ -11,7 +13,7 @@ export class AuthStrategy implements AuthenticationStrategy {
   constructor(
     @inject(AuthenticationBindings.METADATA)
     private metadata: AuthenticationMetadata[]
-  ) {}
+  ) { }
   /**
    * Autenticacion de un usuario frente a una accion en la base datos
    * @param request la solicitud con el token
@@ -20,22 +22,35 @@ export class AuthStrategy implements AuthenticationStrategy {
   async authenticate(request: Request): Promise<UserProfile | undefined> {
     const token = parseBearerToken(request);
     if (token) {
-      const idMenu: string = this.metadata[0].options![0];
-      const accion: string = this.metadata[0].options![1];
+      let idMenu: string = this.metadata[0].options![0];
+      let accion: string = this.metadata[0].options![1];
       console.log(this.metadata);
 
       //conectar con el ms-seguridad
-      console.log("conectar con ms-seguridad");
+      const datos = {token: token, idMenu: idMenu, accion: accion};
+      const urlValidarPermisos = `${ConfiguracionSeguridad.enlaceMicroservicioSeguridad}/validar-permisos`;
+      let res = undefined;
 
-      let continuar: Boolean = false;
-      if(continuar){
-        let perfil: UserProfile = Object.assign({
-          permitido: "OK"
+      fetch(urlValidarPermisos, {
+        method: 'post',
+        body: JSON.stringify(datos),
+        headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+      }).then((res: any) => res.json())
+        .then((json: any) => {
+          console.log("Respuesta:");
+          console.log(json)
+          console.log("conectar con ms-seguridad");
+
+          let continuar: Boolean = false;
+          if (continuar) {
+            let perfil: UserProfile = Object.assign({
+              permitido: "OK"
+            });
+            return perfil;
+          } else {
+            return undefined;
+          }
         });
-        return perfil;
-      }else{
-        return undefined;
-      }
     }
     throw new HttpErrors[401]('no es posible ejecurtar la accion por falta de un token');
   }
