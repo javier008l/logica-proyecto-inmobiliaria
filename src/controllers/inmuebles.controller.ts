@@ -61,7 +61,7 @@ export class InmueblesController {
   }
   @authenticate({
     strategy: "auth",
-    options: [ConfiguracionSeguridad.menuInmuebleUsuarioId, ConfiguracionSeguridad.listarAccion]
+    options: [ConfiguracionSeguridad.menuInmuebleId, ConfiguracionSeguridad.listarAccion]
   })
   @get('/inmueble')
   @response(200, {

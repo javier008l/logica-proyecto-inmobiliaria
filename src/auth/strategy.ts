@@ -30,27 +30,26 @@ export class AuthStrategy implements AuthenticationStrategy {
       const datos = {token: token, idMenu: idMenu, accion: accion};
       const urlValidarPermisos = `${ConfiguracionSeguridad.enlaceMicroservicioSeguridad}/validar-permisos`;
       let res = undefined;
-
-      fetch(urlValidarPermisos, {
+      try{
+      await fetch(urlValidarPermisos, {
         method: 'post',
         body: JSON.stringify(datos),
-        headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+        headers: {'Content-Type': 'application/json'},
       }).then((res: any) => res.json())
         .then((json: any) => {
-          console.log("Respuesta:");
-          console.log(json)
-          console.log("conectar con ms-seguridad");
-
-          let continuar: Boolean = false;
-          if (continuar) {
-            let perfil: UserProfile = Object.assign({
-              permitido: "OK"
-            });
-            return perfil;
-          } else {
-            return undefined;
-          }
+          res = json;
         });
+        if (res) {
+          let perfil: UserProfile = Object.assign({
+            permitido: "OK"
+          });
+          return perfil;
+        } else {
+          return undefined;
+        }
+      }catch (e){
+        throw new HttpErrors[401]('No se tienen permisos sobre la acción a ejecutar.');
+      }
     }
     throw new HttpErrors[401]('no es posible ejecurtar la accion por falta de un token');
   }
