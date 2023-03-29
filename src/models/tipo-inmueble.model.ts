@@ -12,19 +12,20 @@ export class TipoInmueble extends Entity {
   id?: number;
 
   @property({
-    type: 'string',
+    type: 'boolean',
+
   })
-  casa?: string;
+  casa?: boolean;
 
   @property({
-    type: 'string',
+    type: 'boolean',
   })
-  apartamento?: string;
+  apartamento?: boolean;
 
   @property({
-    type: 'string',
+    type: 'boolean',
   })
-  finca?: string;
+  finca?: boolean;
 
   @hasMany(() => Solicitud)
   solicitudes: Solicitud[];
