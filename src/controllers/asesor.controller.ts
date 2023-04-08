@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {
   Count,
   CountSchema,
@@ -7,24 +8,25 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  param,
   patch,
+  post,
   put,
-  del,
   requestBody,
   response,
 } from '@loopback/rest';
+import {ConfiguracionSeguridad} from '../config/configuracion.seguridad';
 import {Asesor} from '../models';
 import {AsesorRepository} from '../repositories';
 
 export class AsesorController {
   constructor(
     @repository(AsesorRepository)
-    public asesorRepository : AsesorRepository,
-  ) {}
+    public asesorRepository: AsesorRepository,
+  ) { }
 
   @post('/asesor')
   @response(200, {
@@ -58,6 +60,10 @@ export class AsesorController {
     return this.asesorRepository.count(where);
   }
 
+  @authenticate({
+    strategy: "auth",
+    options: [ConfiguracionSeguridad.menuAsesorId, ConfiguracionSeguridad.listarAccion]
+  })
   @get('/asesor')
   @response(200, {
     description: 'Array of Asesor model instances',
