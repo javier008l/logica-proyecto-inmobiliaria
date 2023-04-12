@@ -40,6 +40,22 @@ export class Inmueble extends Entity {
   })
   costo: number;
 
+
+  @property({
+    type: 'boolean',
+    required: false,
+    default: false
+  })
+  paraVenta: boolean;
+
+
+  @property({
+    type: 'boolean',
+    required: false,
+    default: false
+  })
+  paraAlquiler: boolean;
+
   @property({
     type: 'string',
   })
