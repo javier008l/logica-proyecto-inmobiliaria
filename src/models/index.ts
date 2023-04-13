@@ -9,3 +9,4 @@ export * from './estado.model';
 export * from './codeudor.model';
 export * from './inmueble.model';
 export * from './tipo-inmueble.model';
+export * from './mensaje-contacto.model';
