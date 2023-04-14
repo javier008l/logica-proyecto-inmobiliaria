@@ -9,12 +9,17 @@ export class NotificacionService {
    * Add service methods here
    */
 
-  sendNotification(data: any, url: string) {
-    fetch(url, {
-      method: 'post',
-      body: JSON.stringify(data),
-      headers: {'Content-Type': 'application/json'},
-    });
+  enviarNotificaciones(datos: any, url: string): boolean {
+    try {
+      fetch(url, {
+        method: 'post',
+        body: JSON.stringify(datos),
+        headers: {'Content-Type': 'application/json'},
+      });
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
 

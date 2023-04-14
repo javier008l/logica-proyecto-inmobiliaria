@@ -9,3 +9,4 @@ export * from './inmueble.repository';
 export * from './solicitud.repository';
 export * from './tipo-inmueble.repository';
 export * from './tipo-solicitud.repository';
+export * from './variables-generales-del-sistema.repository';

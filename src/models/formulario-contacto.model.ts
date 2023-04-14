@@ -1,7 +1,7 @@
 import {Model, model, property} from '@loopback/repository';
 
 @model()
-export class MensajeContacto extends Model {
+export class FormularioContacto extends Model {
   @property({
     type: 'string',
     required: true,
@@ -12,13 +12,13 @@ export class MensajeContacto extends Model {
     type: 'string',
     required: true,
   })
-  nombre: string;
+  tipoMensaje: string;
 
   @property({
     type: 'string',
     required: true,
   })
-  celular: string;
+  nombreCompleto: string;
 
   @property({
     type: 'string',
@@ -28,18 +28,17 @@ export class MensajeContacto extends Model {
 
   @property({
     type: 'string',
-    required: true,
   })
-  tipoDeMensaje: string;
+  celular?: string;
 
 
-  constructor(data?: Partial<MensajeContacto>) {
+  constructor(data?: Partial<FormularioContacto>) {
     super(data);
   }
 }
 
-export interface MensajeContactoRelations {
+export interface FormularioContactoRelations {
   // describe navigational properties here
 }
 
-export type MensajeContactoWithRelations = MensajeContacto & MensajeContactoRelations;
+export type FormularioContactoWithRelations = FormularioContacto & FormularioContactoRelations;
