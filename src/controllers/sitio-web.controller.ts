@@ -4,7 +4,7 @@ import {service} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {HttpErrors, getModelSchemaRef, post, requestBody, response} from '@loopback/rest';
 import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
-import {FormularioContacto, VariablesGeneralesDelSistema} from '../models';
+import {Asesor, FormularioAsesor, FormularioContacto, VariablesGeneralesDelSistema} from '../models';
 import {VariablesGeneralesDelSistemaRepository} from '../repositories';
 import {NotificacionService} from '../services';
 
@@ -71,4 +71,59 @@ export class SitioWebController {
       throw new HttpErrors[500]("Error de servidor para enviar mensaje")
     }
   }
+
+
+  @post('/solicitud-asesor')
+  @response(200, {
+    description: 'Envio del mensaje de solicituda para ser asesor',
+    content: {'aplicacion/json': {schema: getModelSchemaRef(FormularioAsesor)}},
+  })
+  async ValidarPermisosDeAsesor(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(FormularioAsesor),
+        },
+      },
+    })
+    datos: FormularioAsesor,
+  ): Promise<boolean> {
+    try {
+      let variables: VariablesGeneralesDelSistema[] = await this.variablesRepository.find();
+      if ((variables).length == 0) {
+        throw new HttpErrors[500]("No hay variables del sistema para realizar el proceso");
+      }
+      let correoAdministrador = variables[0].correoContactoAdministrador;
+      let nombreAdministrador = variables[0].nombreContactoAdministrador;
+      let asunto = "Contacto desde sitio web";
+      let mensaje = `Estimado ${nombreAdministrador}, se ha enviado un mensaje desde el sitio web para
+      crear crendeciales de asesor a:
+
+      Nombre Completo: ${datos.nombreCompleto}
+      Apellidos Completos : ${datos.apellidoCompleto}
+      Cedula: ${datos.cedula}
+      Correo: ${datos.correo}
+      Número de celular: ${datos.celular}
+      Dirección: ${datos.direccion}
+
+      Hasta pronto,
+      Equipo Técnico,
+      `;
+
+      let datosContacto = {
+        correoDestino: correoAdministrador,
+        nombreDestino: nombreAdministrador,
+        asuntoCorreo: asunto,
+        contenidoCorreo: mensaje
+      };
+
+
+      let enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
+      console.log(enviado);
+      return enviado;
+    } catch {
+      throw new HttpErrors[500]("Error de servidor para enviar mensaje")
+    }
+  }
+
 }
