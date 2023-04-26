@@ -28,8 +28,9 @@ export class FormularioContacto extends Model {
 
   @property({
     type: 'string',
+    required: true,
   })
-  celular?: string;
+  celular: string;
 
 
   constructor(data?: Partial<FormularioContacto>) {
