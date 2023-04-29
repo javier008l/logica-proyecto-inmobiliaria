@@ -1,3 +1,4 @@
+import {service} from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -7,24 +8,35 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  HttpErrors,
+  param,
   patch,
+  post,
   put,
-  del,
   requestBody,
   response,
 } from '@loopback/rest';
+import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
 import {Solicitud} from '../models';
-import {SolicitudRepository} from '../repositories';
+import {AsesorRepository, ClienteRepository, InmuebleRepository, SolicitudRepository} from '../repositories';
+import {NotificacionService} from '../services';
 
 export class SolicitudController {
   constructor(
     @repository(SolicitudRepository)
-    public solicitudRepository : SolicitudRepository,
-  ) {}
+    public solicitudRepository: SolicitudRepository,
+    @repository(InmuebleRepository)
+    public inmuebleRepositorio: InmuebleRepository,
+    @repository(ClienteRepository)
+    public clienteRepositorio: ClienteRepository,
+    @repository(AsesorRepository)
+    public asesorRepositorio: AsesorRepository,
+    @service(NotificacionService)
+    private servicioNotificaciones: NotificacionService,
+  ) { }
 
   @post('/solicitud')
   @response(200, {
@@ -44,6 +56,68 @@ export class SolicitudController {
     })
     solicitud: Omit<Solicitud, 'id'>,
   ): Promise<Solicitud> {
+
+    // Notificar al cliente y al asesor de una nueva solicitud
+    let inmueble = await this.inmuebleRepositorio.findOne({
+      where: {id: solicitud.inmuebleId}
+    });
+    if (inmueble) {
+      let asesor = await this.asesorRepositorio.findOne({
+        where: {id: solicitud.asesorId},
+      });
+      if (asesor) {
+        let cliente = await this.clienteRepositorio.findOne({
+          where: {id: solicitud.clienteId}
+        });
+        if (cliente) {
+
+          // Hacer el metodo para notificar
+          try {
+            // Notificar al cliente
+            let asunto = "Solicitud realizada"
+
+            let mensaje = `<br>Estimado/a ${cliente.primerNombre}, su solicitud se realizo exitosamente,
+            en este momento se encuentra en estado enviado, para más informacion, puede revisar en nuestra
+            pagina web.<br/>
+
+           <br> Hasta pronto,<br/>
+            Equipo Técnico,
+            `;
+
+            let datosCliente = {
+              correoDestino: cliente.correo,
+              nombreDestino: cliente.primerNombre,
+              asuntoCorreo: asunto,
+              contenidoCorreo: mensaje
+            };
+
+            let enviado = this.servicioNotificaciones.enviarNotificaciones(datosCliente, ConfiguracionNotificaciones.urlNotificaciones2fa);
+            console.log(enviado);
+
+            // Notificar al asesor
+            let asunto2 = "Nueva solicitud"
+            let mensaje2 = `<br>Estimado/a ${asesor.primerNombre}, se acaba de realizar una nueva solicitud
+            para el inmueble ${inmueble.id}, que se encuentra en ${inmueble.direccion}, que se encuentra
+            bajo su cargo.<br/>
+
+           <br> Hasta pronto,<br/>
+            Equipo Técnico,
+            `;
+            let datosAsesor = {
+              correoDestino: asesor.correo,
+              nombreDestino: asesor.primerNombre,
+              asuntoCorreo: asunto2,
+              contenidoCorreo: mensaje2
+            };
+            let enviado2 = this.servicioNotificaciones.enviarNotificaciones(datosAsesor, ConfiguracionNotificaciones.urlNotificaciones2fa);
+            console.log(enviado2);
+          } catch {
+            throw new HttpErrors[500]("Error de servidor para enviar mensaje")
+          }
+        }
+      }
+    }
+
     return this.solicitudRepository.create(solicitud);
   }
 

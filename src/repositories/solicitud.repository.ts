@@ -1,13 +1,14 @@
 import {inject, Getter} from '@loopback/core';
 import {DefaultCrudRepository, repository, HasManyRepositoryFactory, BelongsToAccessor} from '@loopback/repository';
 import {MysqlDataSource} from '../datasources';
-import {Solicitud, SolicitudRelations, Estado, Cliente, Asesor, Codeudor, TipoSolicitud, TipoInmueble} from '../models';
+import {Solicitud, SolicitudRelations, Estado, Cliente, Asesor, Codeudor, TipoSolicitud, TipoInmueble, Inmueble} from '../models';
 import {EstadoRepository} from './estado.repository';
 import {ClienteRepository} from './cliente.repository';
 import {AsesorRepository} from './asesor.repository';
 import {CodeudorRepository} from './codeudor.repository';
 import {TipoSolicitudRepository} from './tipo-solicitud.repository';
 import {TipoInmuebleRepository} from './tipo-inmueble.repository';
+import {InmuebleRepository} from './inmueble.repository';
 
 export class SolicitudRepository extends DefaultCrudRepository<
   Solicitud,
@@ -27,10 +28,14 @@ export class SolicitudRepository extends DefaultCrudRepository<
 
   public readonly tipoInmueble: BelongsToAccessor<TipoInmueble, typeof Solicitud.prototype.id>;
 
+  public readonly inmueble: BelongsToAccessor<Inmueble, typeof Solicitud.prototype.id>;
+
   constructor(
-    @inject('datasources.mysql') dataSource: MysqlDataSource, @repository.getter('EstadoRepository') protected estadoRepositoryGetter: Getter<EstadoRepository>, @repository.getter('ClienteRepository') protected clienteRepositoryGetter: Getter<ClienteRepository>, @repository.getter('AsesorRepository') protected asesorRepositoryGetter: Getter<AsesorRepository>, @repository.getter('CodeudorRepository') protected codeudorRepositoryGetter: Getter<CodeudorRepository>, @repository.getter('TipoSolicitudRepository') protected tipoSolicitudRepositoryGetter: Getter<TipoSolicitudRepository>, @repository.getter('TipoInmuebleRepository') protected tipoInmuebleRepositoryGetter: Getter<TipoInmuebleRepository>,
+    @inject('datasources.mysql') dataSource: MysqlDataSource, @repository.getter('EstadoRepository') protected estadoRepositoryGetter: Getter<EstadoRepository>, @repository.getter('ClienteRepository') protected clienteRepositoryGetter: Getter<ClienteRepository>, @repository.getter('AsesorRepository') protected asesorRepositoryGetter: Getter<AsesorRepository>, @repository.getter('CodeudorRepository') protected codeudorRepositoryGetter: Getter<CodeudorRepository>, @repository.getter('TipoSolicitudRepository') protected tipoSolicitudRepositoryGetter: Getter<TipoSolicitudRepository>, @repository.getter('TipoInmuebleRepository') protected tipoInmuebleRepositoryGetter: Getter<TipoInmuebleRepository>, @repository.getter('InmuebleRepository') protected inmuebleRepositoryGetter: Getter<InmuebleRepository>,
   ) {
     super(Solicitud, dataSource);
+    this.inmueble = this.createBelongsToAccessorFor('inmueble', inmuebleRepositoryGetter,);
+    this.registerInclusionResolver('inmueble', this.inmueble.inclusionResolver);
     this.tipoInmueble = this.createBelongsToAccessorFor('tipoInmueble', tipoInmuebleRepositoryGetter,);
     this.registerInclusionResolver('tipoInmueble', this.tipoInmueble.inclusionResolver);
     this.tipoSolicitud = this.createBelongsToAccessorFor('tipoSolicitud', tipoSolicitudRepositoryGetter,);
