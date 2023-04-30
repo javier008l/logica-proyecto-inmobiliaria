@@ -94,6 +94,15 @@ export class SolicitudController {
             let enviado = this.servicioNotificaciones.enviarNotificaciones(datosCliente, ConfiguracionNotificaciones.urlNotificaciones2fa);
             console.log(enviado);
 
+            // notificar al usuario via sms
+            let datosSMS = {
+              numeroDestino: cliente.telefono,
+              contenidoMensaje: `Hola ${cliente.primerNombre}, la solicitud ${solicitud.tipoSolicitudId}que acaba de realizar
+              con nuestra inmobiliaria fue exitosa, actualmente se encuentra en estado enviado!`,
+            };
+            const url = ConfiguracionNotificaciones.urlNotificacionesSms;
+            this.servicioNotificaciones.enviarNotificaciones(datosSMS, url);
+
             // Notificar al asesor
             let asunto2 = "Nueva solicitud"
             let mensaje2 = `<br>Estimado/a ${asesor.primerNombre}, se acaba de realizar una nueva solicitud
