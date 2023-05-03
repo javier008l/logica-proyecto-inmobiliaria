@@ -9,6 +9,7 @@ import {Asesor} from './asesor.model';
 import {Cliente} from './cliente.model';
 import {Codeudor} from './codeudor.model';
 import {Estado} from './estado.model';
+import {Inmueble} from './inmueble.model';
 import {TipoInmueble} from './tipo-inmueble.model';
 import {TipoSolicitud} from './tipo-solicitud.model';
 
@@ -45,6 +46,12 @@ import {TipoSolicitud} from './tipo-solicitud.model';
         entityKey: 'id',
         foreignKey: 'tipoInmuebleId',
       },
+      fk_solicitud_inmueble_idInmueble: {
+        name: 'fk_solicitud_inmueble_idInmueble',
+        entity: 'Inmueble',
+        entityKey: 'id',
+        foreignKey: 'inmuebleId',
+      },
     },
   },
 })
@@ -78,6 +85,9 @@ export class Solicitud extends Entity {
 
   @belongsTo(() => TipoInmueble)
   tipoInmuebleId: number;
+
+  @belongsTo(() => Inmueble)
+  inmuebleId: number;
 
   constructor(data?: Partial<Solicitud>) {
     super(data);

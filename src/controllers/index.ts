@@ -34,4 +34,5 @@ export * from './tipo-inmueble-solicitud.controller';
 export * from './tipo-inmueble.controller';
 export * from './tipo-solicitud-solicitud.controller';
 export * from './tipo-solicitud.controller';
-
+export * from './solicitud-inmueble.controller';
+export * from './asesor-inmueble.controller';
