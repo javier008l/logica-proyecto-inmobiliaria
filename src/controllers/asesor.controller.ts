@@ -11,6 +11,7 @@ import {
   del,
   get,
   getModelSchemaRef,
+  HttpErrors,
   param,
   patch,
   post,
@@ -21,12 +22,74 @@ import {
 import {ConfiguracionSeguridad} from '../config/configuracion.seguridad';
 import {Asesor} from '../models';
 import {AsesorRepository} from '../repositories';
+import {service} from '@loopback/core';
+import {NotificacionService} from '../services';
+import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
 
 export class AsesorController {
   constructor(
     @repository(AsesorRepository)
     public asesorRepository: AsesorRepository,
+    @service(NotificacionService)
+    private servicioNotificaciones: NotificacionService,
+    @repository(AsesorRepository)
+    private repositorioAsesor: AsesorRepository
   ) { }
+
+  @post('/aceptar-asesor')
+  @response(200, {
+    description: 'Envio del mensaje de solicituda para ser asesor',
+    content: {'aplicacion/json': {schema: getModelSchemaRef(Asesor)}},
+  })
+  async aceptarAsesor(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(Asesor),
+        },
+      },
+    })
+    datos: Asesor,
+  ): Promise<Object> {
+    try {
+      const asesor = this.repositorioAsesor.findOne({
+        where :{
+          correo : datos.correo
+        }
+      })
+      this.asesorRepository.save(datos);
+      
+      let correoNuevoAsesor = datos.correo;
+      let nombreAsesor = datos.primerNombre;
+      let asunto = "Credenciales asesor";
+      let mensaje = `Estimado/a ${datos.primerNombre}, ha sido aceptado/a en nuestra inmobiliaria,
+      sus crendeciales de asesor son:
+
+      Correo: ${datos.correo},
+
+      debe ingresar con el correo, debe darle en olvide mi contraseña, el sistema le
+      generará una nueva que se le enviará al siguiente número de celular:
+
+      ${datos.telefono}
+
+      Hasta pronto,
+      Equipo Técnico,
+      `;
+      let datosContacto = {
+        correoDestino: correoNuevoAsesor,
+        nombreDestino: nombreAsesor,
+        asuntoCorreo: asunto,
+        contenidoCorreo: mensaje
+      };
+
+      let enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
+      console.log(enviado);
+      return enviado;
+    } catch {
+      throw new HttpErrors[500]("Error de servidor para enviar mensaje")
+    }
+
+  }
 
   @post('/asesor')
   @response(200, {
@@ -153,4 +216,5 @@ export class AsesorController {
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.asesorRepository.deleteById(id);
   }
+
 }
