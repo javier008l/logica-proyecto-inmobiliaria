@@ -48,13 +48,13 @@ export class Asesor extends Entity {
     type: 'string',
     required: true,
   })
-  cedula: string;
+  correo: string;
 
   @property({
     type: 'string',
     required: true,
   })
-  correo: string;
+  cedula: string;
 
   @property({
     type: 'string',

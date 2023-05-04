@@ -23,7 +23,7 @@ import {ConfiguracionSeguridad} from '../config/configuracion.seguridad';
 import {Asesor} from '../models';
 import {AsesorRepository} from '../repositories';
 import {service} from '@loopback/core';
-import {NotificacionService} from '../services';
+import {NotificacionService, SeguridadService} from '../services';
 import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
 
 export class AsesorController {
@@ -33,8 +33,16 @@ export class AsesorController {
     @service(NotificacionService)
     private servicioNotificaciones: NotificacionService,
     @repository(AsesorRepository)
-    private repositorioAsesor: AsesorRepository
+    private repositorioAsesor: AsesorRepository,
+    @service(SeguridadService)
+    private servicioSeguridad : SeguridadService,
   ) { }
+
+  /**
+   * se notifica al asesor que a sido aceptado y se guarda en base de datos
+   * @param datos de asesor
+   * @returns true, cuando se ha creado y notificado al asesor
+   */
 
   @post('/aceptar-asesor')
   @response(200, {
@@ -58,7 +66,7 @@ export class AsesorController {
         }
       })
       this.asesorRepository.save(datos);
-      
+
       let correoNuevoAsesor = datos.correo;
       let nombreAsesor = datos.primerNombre;
       let asunto = "Credenciales asesor";
@@ -82,6 +90,19 @@ export class AsesorController {
         contenidoCorreo: mensaje
       };
 
+      let datosUsuario ={
+        primerNombre: datos.primerNombre,
+        segundoNombre: datos.segundoNombre,
+        primerApellido: datos.primerApellido,
+        segundoApellido: datos.segundoApellido,
+        correo: datos.correo,
+        celular: datos.telefono,
+        clave:"",
+        rolId: ConfiguracionSeguridad.rolAsesorId
+      };
+
+      let seguridad = this.servicioSeguridad.datosUsuario(datosUsuario, ConfiguracionSeguridad.enlaceSeguridadDatosAsesor)
+      console.log(seguridad);
       let enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
       console.log(enviado);
       return enviado;
