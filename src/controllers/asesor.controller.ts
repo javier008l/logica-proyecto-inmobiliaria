@@ -99,9 +99,7 @@ export class AsesorController {
         celular: datos.telefono,
         cedula: datos.cedula,
         clave: "",
-        rolId: ConfiguracionSeguridad.rolAsesorId,
-        EstadoValidacion: true,
-
+        rolId: ConfiguracionSeguridad.rolAsesorId
       };
 
       const seguridad = this.servicioSeguridad.datosUsuario(datosUsuario, ConfiguracionSeguridad.enlaceSeguridadDatosAsesor)

@@ -4,8 +4,13 @@ import {service} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {HttpErrors, getModelSchemaRef, post, requestBody, response} from '@loopback/rest';
 import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
+<<<<<<< HEAD
 import {FormularioAsesor, FormularioContacto, VariablesGeneralesDelSistema} from '../models';
 import {AsesorRepository, VariablesGeneralesDelSistemaRepository} from '../repositories';
+=======
+import {FormularioAsesor, FormularioContacto, Inmueble, VariablesGeneralesDelSistema} from '../models';
+import {AsesorRepository, ClienteRepository, InmuebleRepository, VariablesGeneralesDelSistemaRepository} from '../repositories';
+>>>>>>> 3a1ce299ea62e72f6b97e10b32b523bad8e46a16
 import {NotificacionService, SeguridadService} from '../services';
 
 // import {inject} from '@loopback/core';
@@ -20,7 +25,11 @@ export class SitioWebController {
     @service(SeguridadService)
     private servicioSeguridad: SeguridadService,
     @repository(AsesorRepository)
-    private respositorioAsesor: AsesorRepository
+    private respositorioAsesor: AsesorRepository,
+    @repository(ClienteRepository)
+    private clienteRepositorio: ClienteRepository,
+    @repository(InmuebleRepository)
+    private inmuebleRepositorio: InmuebleRepository,
   ) {
   }
 
@@ -56,6 +65,14 @@ export class SitioWebController {
 
       Texto del mensaje: ${datos.mensaje}
 
+      Dirrección del inmueble: ${datos.direccionInmueble}
+
+      Costo por el cual deseo vender o alquilar: ${datos.costo}
+
+      alquiler: ${datos.paraAlquiler}
+
+      venta: ${datos.paraVenta}
+
       Hasta pronto,
       Equipo Técnico,
       `;
@@ -66,18 +83,27 @@ export class SitioWebController {
         asuntoCorreo: asunto,
         contenidoCorreo: mensaje
       };
+<<<<<<< HEAD
 
 
       const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
+=======
+      let enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
+>>>>>>> 3a1ce299ea62e72f6b97e10b32b523bad8e46a16
       console.log(enviado);
       return enviado;
-    } catch {
+    } catch (e) {
+      console.log(e);
       throw new HttpErrors[500]("Error de servidor para enviar mensaje")
     }
   }
 
+<<<<<<< HEAD
 
   @post('/registro-publico-asesor')
+=======
+  @post('/solicitud-asesor')
+>>>>>>> 3a1ce299ea62e72f6b97e10b32b523bad8e46a16
   @response(200, {
     description: 'Envio del mensaje de solicituda para ser asesor',
     content: {'aplicacion/json': {schema: getModelSchemaRef(FormularioAsesor)}},

@@ -1,19 +1,7 @@
-import {Model, model, property} from '@loopback/repository';
+import {Entity , model, property} from '@loopback/repository';
 
 @model()
-export class FormularioContacto extends Model {
-  @property({
-    type: 'string',
-    required: true,
-  })
-  mensaje: string;
-
-  @property({
-    type: 'string',
-    required: true,
-  })
-  tipoMensaje: string;
-
+export class FormularioContacto extends Entity {
   @property({
     type: 'string',
     required: true,
@@ -31,6 +19,42 @@ export class FormularioContacto extends Model {
     required: true,
   })
   celular: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  tipoMensaje: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  mensaje: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  direccionInmueble: string;
+
+  @property({
+    type: 'number',
+    required: true,
+  })
+  costo: number;
+
+  @property({
+    type: 'boolean',
+    required: true,
+  })
+  paraAlquiler: boolean;
+
+  @property({
+    type: 'boolean',
+    required: true,
+  })
+  paraVenta: boolean;
 
 
   constructor(data?: Partial<FormularioContacto>) {

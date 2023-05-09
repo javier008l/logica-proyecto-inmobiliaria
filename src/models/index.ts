@@ -13,3 +13,4 @@ export * from './tipo-solicitud.model';
 export * from './variables-generales-del-sistema.model';
 
 export * from './formulario-asesor.model';
+export * from './formulario-contacto.model';
