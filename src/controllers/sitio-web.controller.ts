@@ -4,13 +4,8 @@ import {service} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {HttpErrors, getModelSchemaRef, post, requestBody, response} from '@loopback/rest';
 import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
-<<<<<<< HEAD
 import {FormularioAsesor, FormularioContacto, VariablesGeneralesDelSistema} from '../models';
-import {AsesorRepository, VariablesGeneralesDelSistemaRepository} from '../repositories';
-=======
-import {FormularioAsesor, FormularioContacto, Inmueble, VariablesGeneralesDelSistema} from '../models';
 import {AsesorRepository, ClienteRepository, InmuebleRepository, VariablesGeneralesDelSistemaRepository} from '../repositories';
->>>>>>> 3a1ce299ea62e72f6b97e10b32b523bad8e46a16
 import {NotificacionService, SeguridadService} from '../services';
 
 // import {inject} from '@loopback/core';
@@ -50,7 +45,7 @@ export class SitioWebController {
   ): Promise<boolean> {
     try {
       const variables: VariablesGeneralesDelSistema[] = await this.variablesRepository.find();
-      if ((variables).length == 0) {
+      if ((variables).length === 0) {
         throw new HttpErrors[500]("No hay variables del sistema para realizar el proceso");
       }
       const correoAdministrador = variables[0].correoContactoAdministrador;
@@ -83,13 +78,8 @@ export class SitioWebController {
         asuntoCorreo: asunto,
         contenidoCorreo: mensaje
       };
-<<<<<<< HEAD
-
 
       const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
-=======
-      let enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
->>>>>>> 3a1ce299ea62e72f6b97e10b32b523bad8e46a16
       console.log(enviado);
       return enviado;
     } catch (e) {
@@ -98,12 +88,7 @@ export class SitioWebController {
     }
   }
 
-<<<<<<< HEAD
-
   @post('/registro-publico-asesor')
-=======
-  @post('/solicitud-asesor')
->>>>>>> 3a1ce299ea62e72f6b97e10b32b523bad8e46a16
   @response(200, {
     description: 'Envio del mensaje de solicituda para ser asesor',
     content: {'aplicacion/json': {schema: getModelSchemaRef(FormularioAsesor)}},
@@ -120,7 +105,7 @@ export class SitioWebController {
   ): Promise<boolean> {
     try {
       const variables: VariablesGeneralesDelSistema[] = await this.variablesRepository.find();
-      if ((variables).length == 0) {
+      if ((variables).length === 0) {
         throw new HttpErrors[500]("No hay variables del sistema para realizar el proceso");
       }
       const correoAdministrador = variables[0].correoContactoAdministrador;
