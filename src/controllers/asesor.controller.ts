@@ -1,4 +1,5 @@
 import {authenticate} from '@loopback/authentication';
+import {service} from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -19,12 +20,11 @@ import {
   requestBody,
   response,
 } from '@loopback/rest';
+import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
 import {ConfiguracionSeguridad} from '../config/configuracion.seguridad';
 import {Asesor} from '../models';
 import {AsesorRepository} from '../repositories';
-import {service} from '@loopback/core';
 import {NotificacionService, SeguridadService} from '../services';
-import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
 
 export class AsesorController {
   constructor(
@@ -35,7 +35,7 @@ export class AsesorController {
     @repository(AsesorRepository)
     private repositorioAsesor: AsesorRepository,
     @service(SeguridadService)
-    private servicioSeguridad : SeguridadService,
+    private servicioSeguridad: SeguridadService,
   ) { }
 
   /**
@@ -44,7 +44,7 @@ export class AsesorController {
    * @returns true, cuando se ha creado y notificado al asesor
    */
 
-  @post('/aceptar-asesor')
+  @post('/registro-privado-asesor')
   @response(200, {
     description: 'Envio del mensaje de solicituda para ser asesor',
     content: {'aplicacion/json': {schema: getModelSchemaRef(Asesor)}},
@@ -61,16 +61,16 @@ export class AsesorController {
   ): Promise<Object> {
     try {
       const asesor = this.repositorioAsesor.findOne({
-        where :{
-          correo : datos.correo
+        where: {
+          correo: datos.correo
         }
       })
       this.asesorRepository.save(datos);
 
-      let correoNuevoAsesor = datos.correo;
-      let nombreAsesor = datos.primerNombre;
-      let asunto = "Credenciales asesor";
-      let mensaje = `Estimado/a ${datos.primerNombre}, ha sido aceptado/a en nuestra inmobiliaria,
+      const correoNuevoAsesor = datos.correo;
+      const nombreAsesor = datos.primerNombre;
+      const asunto = "Credenciales asesor";
+      const mensaje = `Estimado/a ${datos.primerNombre}, ha sido aceptado/a en nuestra inmobiliaria,
       sus crendeciales de asesor son:
 
       Correo: ${datos.correo},
@@ -83,27 +83,30 @@ export class AsesorController {
       Hasta pronto,
       Equipo Técnico,
       `;
-      let datosContacto = {
+      const datosContacto = {
         correoDestino: correoNuevoAsesor,
         nombreDestino: nombreAsesor,
         asuntoCorreo: asunto,
         contenidoCorreo: mensaje
       };
 
-      let datosUsuario ={
+      const datosUsuario = {
         primerNombre: datos.primerNombre,
         segundoNombre: datos.segundoNombre,
         primerApellido: datos.primerApellido,
         segundoApellido: datos.segundoApellido,
         correo: datos.correo,
         celular: datos.telefono,
-        clave:"",
-        rolId: ConfiguracionSeguridad.rolAsesorId
+        cedula: datos.cedula,
+        clave: "",
+        rolId: ConfiguracionSeguridad.rolAsesorId,
+        EstadoValidacion: true,
+
       };
 
-      let seguridad = this.servicioSeguridad.datosUsuario(datosUsuario, ConfiguracionSeguridad.enlaceSeguridadDatosAsesor)
+      const seguridad = this.servicioSeguridad.datosUsuario(datosUsuario, ConfiguracionSeguridad.enlaceSeguridadDatosAsesor)
       console.log(seguridad);
-      let enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
+      const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
       console.log(enviado);
       return enviado;
     } catch {

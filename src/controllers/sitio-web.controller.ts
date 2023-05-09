@@ -4,8 +4,7 @@ import {service} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {HttpErrors, getModelSchemaRef, post, requestBody, response} from '@loopback/rest';
 import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
-import { ConfiguracionSeguridad } from '../config/configuracion.seguridad';
-import {Asesor, FormularioAsesor, FormularioContacto, VariablesGeneralesDelSistema} from '../models';
+import {FormularioAsesor, FormularioContacto, VariablesGeneralesDelSistema} from '../models';
 import {AsesorRepository, VariablesGeneralesDelSistemaRepository} from '../repositories';
 import {NotificacionService, SeguridadService} from '../services';
 
@@ -19,7 +18,7 @@ export class SitioWebController {
     @service(NotificacionService)
     private servicioNotificaciones: NotificacionService,
     @service(SeguridadService)
-    private servicioSeguridad : SeguridadService,
+    private servicioSeguridad: SeguridadService,
     @repository(AsesorRepository)
     private respositorioAsesor: AsesorRepository
   ) {
@@ -41,14 +40,14 @@ export class SitioWebController {
     datos: FormularioContacto,
   ): Promise<boolean> {
     try {
-      let variables: VariablesGeneralesDelSistema[] = await this.variablesRepository.find();
+      const variables: VariablesGeneralesDelSistema[] = await this.variablesRepository.find();
       if ((variables).length == 0) {
         throw new HttpErrors[500]("No hay variables del sistema para realizar el proceso");
       }
-      let correoAdministrador = variables[0].correoContactoAdministrador;
-      let nombreAdministrador = variables[0].nombreContactoAdministrador;
-      let asunto = "Contacto desde sitio web";
-      let mensaje = `Estimado ${nombreAdministrador}, se ha enviad un mensaje desde el sitio web con la siguiente información:
+      const correoAdministrador = variables[0].correoContactoAdministrador;
+      const nombreAdministrador = variables[0].nombreContactoAdministrador;
+      const asunto = "Contacto desde sitio web";
+      const mensaje = `Estimado ${nombreAdministrador}, se ha enviad un mensaje desde el sitio web con la siguiente información:
 
       Nombre: ${datos.nombreCompleto}
       Correo: ${datos.correo}
@@ -61,7 +60,7 @@ export class SitioWebController {
       Equipo Técnico,
       `;
 
-      let datosContacto = {
+      const datosContacto = {
         correoDestino: correoAdministrador,
         nombreDestino: nombreAdministrador,
         asuntoCorreo: asunto,
@@ -69,7 +68,7 @@ export class SitioWebController {
       };
 
 
-      let enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
+      const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
       console.log(enviado);
       return enviado;
     } catch {
@@ -78,7 +77,7 @@ export class SitioWebController {
   }
 
 
-  @post('/solicitud-asesor')
+  @post('/registro-publico-asesor')
   @response(200, {
     description: 'Envio del mensaje de solicituda para ser asesor',
     content: {'aplicacion/json': {schema: getModelSchemaRef(FormularioAsesor)}},
@@ -94,14 +93,14 @@ export class SitioWebController {
     datos: FormularioAsesor,
   ): Promise<boolean> {
     try {
-      let variables: VariablesGeneralesDelSistema[] = await this.variablesRepository.find();
+      const variables: VariablesGeneralesDelSistema[] = await this.variablesRepository.find();
       if ((variables).length == 0) {
         throw new HttpErrors[500]("No hay variables del sistema para realizar el proceso");
       }
-      let correoAdministrador = variables[0].correoContactoAdministrador;
-      let nombreAdministrador = variables[0].nombreContactoAdministrador;
-      let asunto = "Contacto desde sitio web";
-      let mensaje = `Estimado/a ${nombreAdministrador}, se ha enviado un mensaje desde el sitio web para
+      const correoAdministrador = variables[0].correoContactoAdministrador;
+      const nombreAdministrador = variables[0].nombreContactoAdministrador;
+      const asunto = "Contacto desde sitio web";
+      const mensaje = `Estimado/a ${nombreAdministrador}, se ha enviado un mensaje desde el sitio web para
       crear crendeciales de asesor a:
 
       Nombre Completo: ${datos.nombreCompleto}
@@ -115,7 +114,7 @@ export class SitioWebController {
       Equipo Técnico,
       `;
 
-      let datosContacto = {
+      const datosContacto = {
         correoDestino: correoAdministrador,
         nombreDestino: nombreAdministrador,
         asuntoCorreo: asunto,
@@ -123,7 +122,7 @@ export class SitioWebController {
       };
 
 
-      let enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
+      const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
       console.log(enviado);
       return enviado;
     } catch {
