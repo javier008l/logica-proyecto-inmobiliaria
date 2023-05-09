@@ -17,15 +17,21 @@ import {
   del,
   requestBody,
   response,
+  HttpErrors,
 } from '@loopback/rest';
 import {ConfiguracionSeguridad} from '../config/configuracion.seguridad';
 import {Inmueble} from '../models';
 import {InmuebleRepository} from '../repositories';
+import {service} from '@loopback/core';
+import {NotificacionService} from '../services';
 
 export class InmueblesController {
   constructor(
     @repository(InmuebleRepository)
     public inmuebleRepository : InmuebleRepository,
+    @service(NotificacionService)
+    private servicioNotificaciones: NotificacionService,
+
   ) {}
 
   @post('/inmueble')

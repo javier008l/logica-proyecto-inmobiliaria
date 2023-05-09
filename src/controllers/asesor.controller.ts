@@ -98,7 +98,9 @@ export class AsesorController {
         correo: datos.correo,
         celular: datos.telefono,
         clave:"",
-        rolId: ConfiguracionSeguridad.rolAsesorId
+        rolId: ConfiguracionSeguridad.rolAsesorId,
+        estadoValidacion: true,
+        aceptado: true
       };
 
       let seguridad = this.servicioSeguridad.datosUsuario(datosUsuario, ConfiguracionSeguridad.enlaceSeguridadDatosAsesor)

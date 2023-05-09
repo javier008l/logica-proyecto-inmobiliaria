@@ -46,7 +46,7 @@ export class Inmueble extends Entity {
     required: false,
     default: false
   })
-  paraVenta: boolean;
+  paraVenta?: boolean;
 
 
   @property({
@@ -54,7 +54,7 @@ export class Inmueble extends Entity {
     required: false,
     default: false
   })
-  paraAlquiler: boolean;
+  paraAlquiler?: boolean;
 
   @property({
     type: 'string',
