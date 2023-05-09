@@ -57,7 +57,7 @@ export class AsesorController {
         },
       },
     })
-    datos: Asesor,
+    datos: Asesor
   ): Promise<Object> {
     try {
       const asesor = this.repositorioAsesor.findOne({
@@ -65,7 +65,7 @@ export class AsesorController {
           correo : datos.correo
         }
       })
-      this.asesorRepository.save(datos);
+      this.asesorRepository.create({...datos, id: undefined, inmuebleId: undefined});
 
       let correoNuevoAsesor = datos.correo;
       let nombreAsesor = datos.primerNombre;
@@ -100,7 +100,8 @@ export class AsesorController {
         clave:"",
         rolId: ConfiguracionSeguridad.rolAsesorId,
         estadoValidacion: true,
-        aceptado: true
+        aceptado: true,
+        idInmueble: datos.inmuebleId
       };
 
       let seguridad = this.servicioSeguridad.datosUsuario(datosUsuario, ConfiguracionSeguridad.enlaceSeguridadDatosAsesor)
