@@ -1,6 +1,6 @@
-import {Entity, model, property, hasMany} from '@loopback/repository';
-import {Solicitud} from './solicitud.model';
+import {Entity, hasMany, model, property} from '@loopback/repository';
 import {Inmueble} from './inmueble.model';
+import {Solicitud} from './solicitud.model';
 
 @model()
 export class TipoInmueble extends Entity {
