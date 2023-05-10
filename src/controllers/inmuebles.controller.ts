@@ -1,4 +1,5 @@
 import {authenticate} from '@loopback/authentication';
+import {service} from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -8,32 +9,34 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  param,
   patch,
+  post,
   put,
-  del,
   requestBody,
-  response,
-  HttpErrors,
+  response
 } from '@loopback/rest';
 import {ConfiguracionSeguridad} from '../config/configuracion.seguridad';
 import {Inmueble} from '../models';
 import {InmuebleRepository} from '../repositories';
-import {service} from '@loopback/core';
 import {NotificacionService} from '../services';
 
 export class InmueblesController {
   constructor(
     @repository(InmuebleRepository)
-    public inmuebleRepository : InmuebleRepository,
+    public inmuebleRepository: InmuebleRepository,
     @service(NotificacionService)
     private servicioNotificaciones: NotificacionService,
 
-  ) {}
+  ) { }
 
+  @authenticate({
+    strategy: 'auth',
+    options: [ConfiguracionSeguridad.menuInmuebleId, ConfiguracionSeguridad.guardarAccion]
+  })
   @post('/inmueble')
   @response(200, {
     description: 'Inmueble model instance',

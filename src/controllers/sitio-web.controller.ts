@@ -133,7 +133,7 @@ export class SitioWebController {
       };
 
 
-      const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
+      const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificacionesInfoAsesor);
       console.log(enviado);
       return enviado;
     } catch {
