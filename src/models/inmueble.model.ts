@@ -60,6 +60,7 @@ export class Inmueble extends Entity {
     type: 'string',
   })
   foto?: string;
+
   @belongsTo(() => TipoInmueble)
   tipoInmuebleId: number;
 

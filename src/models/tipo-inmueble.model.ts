@@ -15,7 +15,7 @@ export class TipoInmueble extends Entity {
     type: 'string',
     required: true
   })
-  tipoDeInmueble: string;
+  nuevoTipoInmueble: string;
 
   @hasMany(() => Solicitud)
   solicitudes: Solicitud[];
