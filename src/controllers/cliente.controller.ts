@@ -7,13 +7,13 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  param,
   patch,
+  post,
   put,
-  del,
   requestBody,
   response,
 } from '@loopback/rest';
@@ -23,8 +23,30 @@ import {ClienteRepository} from '../repositories';
 export class ClienteController {
   constructor(
     @repository(ClienteRepository)
-    public clienteRepository : ClienteRepository,
-  ) {}
+    public clienteRepository: ClienteRepository,
+  ) { }
+
+  @post('/datos-cliente')
+  @response(200, {
+    description: '',
+    content: {'aplicacion/json': {schema: getModelSchemaRef(Cliente)}},
+  })
+  async guardarDatos(
+    @requestBody(({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(Cliente),
+        },
+      },
+    }))
+    datos: any,
+  ): Promise<Cliente> {
+    console.log(datos)
+    let created = await this.clienteRepository.create(datos);
+    console.log(created);
+    return created;
+  }
+
 
   @post('/cliente')
   @response(200, {

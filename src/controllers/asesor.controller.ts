@@ -22,9 +22,10 @@ import {
 } from '@loopback/rest';
 import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
 import {ConfiguracionSeguridad} from '../config/configuracion.seguridad';
-import {Asesor} from '../models';
+import {Asesor, DatosAsignacionInmuebleAsesor} from '../models';
 import {AsesorRepository} from '../repositories';
 import {NotificacionService, SeguridadService} from '../services';
+import {inject} from '@loopback/core';
 
 export class AsesorController {
   constructor(
@@ -35,7 +36,7 @@ export class AsesorController {
     @repository(AsesorRepository)
     private repositorioAsesor: AsesorRepository,
     @service(SeguridadService)
-    private servicioSeguridad: SeguridadService,
+    private servicioSeguridad: SeguridadService
   ) { }
 
   /**
@@ -97,7 +98,7 @@ export class AsesorController {
         segundoApellido: datos.segundoApellido,
         correo: datos.correo,
         celular: datos.telefono,
-        clave:"",
+        clave: "",
         rolId: ConfiguracionSeguridad.rolAsesorId,
         estadoValidacion: true,
         aceptado: true,
@@ -238,6 +239,69 @@ export class AsesorController {
   })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.asesorRepository.deleteById(id);
+  }
+
+  @post('/asignar-inmueble-asesor')
+  @response(200, {
+    description: 'se notifica al asesor que se le asigno un inmueble y se guarda en base de datos',
+    content: {'aplicacion/json': {schema: getModelSchemaRef(DatosAsignacionInmuebleAsesor)}},
+  })
+  async asignarInmueble(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(DatosAsignacionInmuebleAsesor),
+        },
+      },
+    })
+    datos: DatosAsignacionInmuebleAsesor,
+    datosAsesor: Asesor
+  ): Promise<Object> {
+    try {
+      console.log("Entré al try");
+      const asesor = await this.repositorioAsesor.findOne({
+        where: {
+          id: datos.idAsesor
+        }
+      })
+      if (asesor) {
+        console.log("Entré al if");
+        await this.asesorRepository.replaceById(datos.idAsesor,{inmuebleId: datos.idInmueble});
+
+        const correoAsesor = datosAsesor.correo;
+        const nombreAsesor = datosAsesor.primerNombre;
+        const asunto = "Credenciales asesor";
+        const mensaje = `Estimado/a ${datosAsesor.primerNombre}, ha sido aceptado/a en nuestra inmobiliaria,
+        sus crendeciales de asesor son:
+
+        Correo: ,
+
+        debe ingresar con el correo, debe darle en olvide mi contraseña, el sistema le
+        generará una nueva que se le enviará al siguiente número de celular:
+
+
+
+        Hasta pronto,
+        Equipo Técnico,
+        `;
+        const datosContacto = {
+          correoDestino: correoAsesor,
+          nombreDestino: nombreAsesor,
+          asuntoCorreo: asunto,
+          contenidoCorreo: mensaje
+        };
+
+        const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
+        console.log(enviado);
+        return enviado;
+      } else{
+        console.log("no se contro ninguna asesor con ese id:");
+        return datos.idAsesor;
+      }
+    } catch {
+      throw new HttpErrors[500]("Error de servidor para enviar mensaje")
+    }
+
   }
 
 }
