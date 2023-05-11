@@ -266,8 +266,8 @@ export class AsesorController {
         let idDatos =await this.asesorRepository.updateById(asesor.id, {inmuebleId: datos.idInmueble});
         const correoAsesor = asesor.correo;
         const nombreAsesor = asesor.primerNombre;
-        const asunto = "Credenciales asesor";
-        const mensaje = `Estimado/a ${asesor.primerNombre}, se le ha asigando un inmueble
+        const asunto = "Asignación de inmuble asesor";
+        const mensaje = `Estimado/a ${asesor.primerNombre}, se le ha asigando un inmueble.         
 
         Id del nuevo inmueble:${datos.idInmueble} ,
 
