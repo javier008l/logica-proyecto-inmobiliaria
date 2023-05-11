@@ -68,10 +68,10 @@ export class InmueblesController {
   ): Promise<Count> {
     return this.inmuebleRepository.count(where);
   }
-  @authenticate({
-    strategy: "auth",
-    options: [ConfiguracionSeguridad.menuInmuebleId, ConfiguracionSeguridad.listarAccion]
-  })
+  // @authenticate({
+  //   strategy: "auth",
+  //   options: [ConfiguracionSeguridad.menuInmuebleId, ConfiguracionSeguridad.listarAccion]
+  // })
   @get('/inmueble')
   @response(200, {
     description: 'Array of Inmueble model instances',

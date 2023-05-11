@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {service} from '@loopback/core';
 import {
   Count,
@@ -20,6 +21,7 @@ import {
   response,
 } from '@loopback/rest';
 import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
+import {ConfiguracionSeguridad} from '../config/configuracion.seguridad';
 import {Solicitud} from '../models';
 import {AsesorRepository, ClienteRepository, InmuebleRepository, SolicitudRepository} from '../repositories';
 import {NotificacionService} from '../services';
@@ -38,6 +40,10 @@ export class SolicitudController {
     private servicioNotificaciones: NotificacionService,
   ) { }
 
+  @authenticate({
+    strategy: "auth",
+    options: [ConfiguracionSeguridad.menuSolicitudId, ConfiguracionSeguridad.guardarAccion]
+  })
   @post('/solicitud')
   @response(200, {
     description: 'Solicitud model instance',

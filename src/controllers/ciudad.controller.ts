@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {
   Count,
   CountSchema,
@@ -7,25 +8,30 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  param,
   patch,
+  post,
   put,
-  del,
   requestBody,
   response,
 } from '@loopback/rest';
+import {ConfiguracionSeguridad} from '../config/configuracion.seguridad';
 import {Ciudad} from '../models';
 import {CiudadRepository} from '../repositories';
 
 export class CiudadController {
   constructor(
     @repository(CiudadRepository)
-    public ciudadRepository : CiudadRepository,
-  ) {}
+    public ciudadRepository: CiudadRepository,
+  ) { }
 
+  @authenticate({
+    strategy: "auth",
+    options: [ConfiguracionSeguridad.menuCiudadId, ConfiguracionSeguridad.guardarAccion]
+  })
   @post('/ciudad')
   @response(200, {
     description: 'Ciudad model instance',

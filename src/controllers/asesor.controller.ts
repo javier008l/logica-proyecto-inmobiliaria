@@ -25,7 +25,6 @@ import {ConfiguracionSeguridad} from '../config/configuracion.seguridad';
 import {Asesor, DatosAsignacionInmuebleAsesor} from '../models';
 import {AsesorRepository} from '../repositories';
 import {NotificacionService, SeguridadService} from '../services';
-import {inject} from '@loopback/core';
 
 export class AsesorController {
   constructor(
@@ -115,6 +114,10 @@ export class AsesorController {
 
   }
 
+  @authenticate({
+    strategy: "auth",
+    options: [ConfiguracionSeguridad.menuAsesorId, ConfiguracionSeguridad.guardarAccion]
+  })
   @post('/asesor')
   @response(200, {
     description: 'Asesor model instance',
@@ -263,11 +266,11 @@ export class AsesorController {
         }
       })
       if (asesor) {
-        let idDatos =await this.asesorRepository.updateById(asesor.id, {inmuebleId: datos.idInmueble});
+        let idDatos = await this.asesorRepository.updateById(asesor.id, {inmuebleId: datos.idInmueble});
         const correoAsesor = asesor.correo;
         const nombreAsesor = asesor.primerNombre;
         const asunto = "Asignación de inmuble asesor";
-        const mensaje = `Estimado/a ${asesor.primerNombre}, se le ha asigando un inmueble.         
+        const mensaje = `Estimado/a ${asesor.primerNombre}, se le ha asigando un inmueble.
 
         Id del nuevo inmueble:${datos.idInmueble} ,
 
@@ -286,12 +289,12 @@ export class AsesorController {
         const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
         console.log(enviado);
         return enviado;
-      } else{
+      } else {
         console.log("no se contro ninguna asesor con ese id:");
         return datos.idAsesor;
       }
-    } catch (err){
-      console.log("El error es: "+err)
+    } catch (err) {
+      console.log("El error es: " + err)
       throw new HttpErrors[500]("Error de servidor para enviar mensaje")
     }
 
