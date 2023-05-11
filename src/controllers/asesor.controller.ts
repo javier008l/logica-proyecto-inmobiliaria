@@ -97,14 +97,17 @@ export class AsesorController {
         segundoApellido: datos.segundoApellido,
         correo: datos.correo,
         celular: datos.telefono,
+        cedula: datos.cedula,
         clave: "",
         rolId: ConfiguracionSeguridad.rolAsesorId,
         estadoValidacion: true,
         aceptado: true,
       };
+      let datosAsesor = JSON.stringify(datosUsuario);
+      console.log(datos);
 
-      const seguridad = this.servicioSeguridad.datosUsuario(datosUsuario, ConfiguracionSeguridad.enlaceSeguridadDatosAsesor)
-      console.log(seguridad);
+      const seguridad = this.servicioSeguridad.datosUsuario(datosAsesor, ConfiguracionSeguridad.enlaceMicroservicioSeguridad + "datos-asesor")
+      console.log("esto va a: "+seguridad);
       const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
       console.log(enviado);
       return enviado;

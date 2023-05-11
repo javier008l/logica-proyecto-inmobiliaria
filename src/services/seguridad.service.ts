@@ -9,14 +9,19 @@ export class SeguridadService {
    * Add service methods here
    */
   datosUsuario(datos: any, url: string): String {
+    console.log("----------------------------------")
+    console.log(datos);
+    console.log(url);
+    console.log("----------------------------------")
     try {
       fetch(url, {
         method: 'post',
-        body: JSON.stringify(datos),
+        body: datos,
         headers: {'Content-Type': 'application/json'},
       });
       return datos;
-    } catch {
+    } catch (err){
+      console.log(err);
       return "no se enviaron datos a seguridad";
     }
   }
