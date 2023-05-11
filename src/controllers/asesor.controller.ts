@@ -255,29 +255,21 @@ export class AsesorController {
       },
     })
     datos: DatosAsignacionInmuebleAsesor,
-    datosAsesor: Asesor
   ): Promise<Object> {
     try {
-      console.log("Entré al try");
       const asesor = await this.repositorioAsesor.findOne({
         where: {
           id: datos.idAsesor
         }
       })
       if (asesor) {
-        console.log("Entré al if");
-        await this.asesorRepository.replaceById(datos.idAsesor,{inmuebleId: datos.idInmueble});
-
-        const correoAsesor = datosAsesor.correo;
-        const nombreAsesor = datosAsesor.primerNombre;
+        let idDatos =await this.asesorRepository.updateById(asesor.id, {inmuebleId: datos.idInmueble});
+        const correoAsesor = asesor.correo;
+        const nombreAsesor = asesor.primerNombre;
         const asunto = "Credenciales asesor";
-        const mensaje = `Estimado/a ${datosAsesor.primerNombre}, ha sido aceptado/a en nuestra inmobiliaria,
-        sus crendeciales de asesor son:
+        const mensaje = `Estimado/a ${asesor.primerNombre}, se le ha asigando un inmueble
 
-        Correo: ,
-
-        debe ingresar con el correo, debe darle en olvide mi contraseña, el sistema le
-        generará una nueva que se le enviará al siguiente número de celular:
+        Id del nuevo inmueble:${datos.idInmueble} ,
 
 
 
@@ -298,7 +290,8 @@ export class AsesorController {
         console.log("no se contro ninguna asesor con ese id:");
         return datos.idAsesor;
       }
-    } catch {
+    } catch (err){
+      console.log("El error es: "+err)
       throw new HttpErrors[500]("Error de servidor para enviar mensaje")
     }
 
