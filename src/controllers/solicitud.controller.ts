@@ -20,7 +20,8 @@ import {
   response,
 } from '@loopback/rest';
 import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
-import {RespuestaSolicitud, Solicitud} from '../models';
+import {Solicitud} from '../models';
+import {RespuestaSolicitud} from '../models/respuesta-solicitud.model';
 import {AsesorRepository, ClienteRepository, EstadoRepository, InmuebleRepository, SolicitudRepository} from '../repositories';
 import {NotificacionService} from '../services';
 
@@ -64,6 +65,7 @@ export class SolicitudController {
   ): Promise<Solicitud> {
 
     // Notificar al cliente y al asesor de una nueva solicitud
+    solicitud.estadoId = 1;
     let inmueble = await this.inmuebleRepositorio.findOne({
       where: {id: solicitud.inmuebleId}
     });
@@ -103,19 +105,19 @@ export class SolicitudController {
             // notificar al usuario via sms
             let datosSMS = {
               numeroDestino: cliente.telefono,
-              contenidoMensaje: `Hola ${cliente.primerNombre}, la solicitud ${solicitud.tipoSolicitudId}que acaba de realizar
-              con nuestra inmobiliaria fue exitosa, actualmente se encuentra en estado enviado!`,
+              contenidoMensaje: `Hola ${cliente.primerNombre}, la solicitud que acaba de realizar
+              con la Inmobiliaria Tu Hogar fue exitosa, actualmente se encuentra en estado enviado!`,
             };
             const url = ConfiguracionNotificaciones.urlNotificacionesSms;
             this.servicioNotificaciones.enviarNotificaciones(datosSMS, url);
 
             // Notificar al asesor
             let asunto2 = "Nueva solicitud"
-            let mensaje2 = `<br>Estimado/a ${asesor.primerNombre}, se acaba de realizar una nueva solicitud
+            let mensaje2 = `Estimado/a ${asesor.primerNombre}, se acaba de realizar una nueva solicitud
             para el inmueble, que se encuentra en la dirección: ${inmueble.direccion}, el cual se encuentra
-            bajo su cargo.<br/>
+            bajo su cargo.<br>
 
-           <br> Hasta pronto,<br/>
+           Hasta pronto,<br>
             Equipo Técnico,
             `;
             let datosAsesor = {
@@ -278,8 +280,9 @@ export class SolicitudController {
             // Notificar al cliente
             let asunto = "Cambio de estado en su solicitud"
 
-            let mensaje = `<br>Estimado/a ${cliente.primerNombre}, su solicituden este momento se encuentra en estado
-        ${estado.nombre}, para más informacion, puede revisar en nuestra pagina web.<br/>
+            let mensaje = `<br>Estimado/a ${cliente.primerNombre}, su solicituden este momento se encuentra en estado:
+            ${estado.nombre}, para más información, puede revisar en nuestra pagina web.<br/>
+
 
        <br> Hasta pronto,<br/>
         Equipo Técnico,

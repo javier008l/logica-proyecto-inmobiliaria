@@ -25,7 +25,7 @@ export * from './sitio-web.controller';
 export * from './solicitud-asesor.controller';
 export * from './solicitud-cliente.controller';
 export * from './solicitud-codeudor.controller';
-export * from './solicitud-estado.controller';
+// export * from './solicitud-estado.controller';
 export * from './solicitud-inmueble.controller';
 export * from './solicitud-tipo-inmueble.controller';
 export * from './solicitud-tipo-solicitud.controller';

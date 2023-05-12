@@ -1,25 +1,25 @@
 import {
-  belongsTo,
   Entity,
   hasMany,
   model,
-  property,
+  property
 } from '@loopback/repository';
 import {Contrato} from './contrato.model';
-import {Solicitud} from './solicitud.model';
 
-@model({
-  settings: {
-    foreignKeys: {
-      fk_estado_idSolicitud: {
-        name: 'fk_estado_idSolicitud',
-        entity: 'Solicitud',
-        entityKey: 'id',
-        foreignKey: 'solicitudId',
-      },
-    },
-  },
-})
+@model(
+  //   {
+  //   settings: {
+  //     foreignKeys: {
+  //       fk_estado_idSolicitud: {
+  //         name: 'fk_estado_idSolicitud',
+  //         entity: 'Solicitud',
+  //         entityKey: 'id',
+  //         foreignKey: 'solicitudId',
+  //       },
+  //     },
+  //   },
+  // }
+)
 export class Estado extends Entity {
   @property({
     type: 'number',
@@ -58,16 +58,16 @@ export class Estado extends Entity {
   // })
   // aceptadoConCodeudor: boolean;
 
-  @property({
-    type: 'boolean',
-    required: true,
-  })
-  rechazado: boolean;
+  // @property({
+  //   type: 'boolean',
+  //   required: true,
+  // })
+  // rechazado: boolean;
   @hasMany(() => Contrato)
   contratos: Contrato[];
 
-  @belongsTo(() => Solicitud)
-  solicitudId: number;
+  // @belongsTo(() => Solicitud)
+  // solicitudId: number;
 
   constructor(data?: Partial<Estado>) {
     super(data);
