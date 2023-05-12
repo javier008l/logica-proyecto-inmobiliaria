@@ -58,11 +58,18 @@ export class SitioWebController {
         const nombreAdministrador = variables[0].nombreContactoAdministrador;
         const asunto = datos.asunto;
         const mensaje = `Estimado ${nombreAdministrador}, se ha enviado un mensaje desde el sitio web con la siguiente información:
+        -----------
+        ${datos.contenido}, ------------
 
-      Nombre: ${cliente.primerNombre}
-      apellido: ${cliente.primerApellido}
-      Correo: ${datos.correo}
-      Celular: ${cliente.telefono}
+        ${datos.tipo},----------
+        ${datos.direccion},------------
+        ${datos.ventaAlquiler},----------
+
+
+      Nombre: ${cliente.primerNombre}----------
+      apellido: ${cliente.primerApellido}---------
+      Correo: ${datos.correo}----------
+      Celular: ${cliente.telefono}---------
 
       Hasta pronto,
       Equipo Técnico,
@@ -78,7 +85,7 @@ export class SitioWebController {
         const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificacionesFormularioContacto);
         console.log(enviado);
         return enviado;
-      }else{
+      } else {
         console.log("Cliente no encontrado")
         return false
       }
