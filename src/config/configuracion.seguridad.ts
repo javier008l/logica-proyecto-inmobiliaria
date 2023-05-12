@@ -12,6 +12,5 @@ export namespace ConfiguracionSeguridad {
   export const editarAccion = 'editar';
   export const eliminarrAccion = 'eliminar';
   export const descargarAccion = 'descargar';
-  export const enlaceSeguridadDatosAsesor: string = "http://localhost:3001/datos-asesor";
-  export const enlaceMicroservicioSeguridad: string = "http://localhost:3001/"
+  export const enlaceMicroservicioSeguridad = "http://localhost:3001/"
 }
