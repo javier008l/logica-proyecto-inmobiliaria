@@ -75,7 +75,7 @@ export class SitioWebController {
           contenidoCorreo: mensaje
         };
 
-        const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
+        const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificacionesFormularioContacto);
         console.log(enviado);
         return enviado;
       }else{

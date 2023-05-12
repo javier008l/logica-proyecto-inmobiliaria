@@ -11,4 +11,7 @@ export namespace ConfiguracionNotificaciones {
   //   'http://localhost:5154/Notificaciones/correo-cambio-estado-solicitud';
   export const urlNotificacionesNuevaSolicitudAsesor =
     'http://localhost:5154/Notificaciones/correo-notificar-solicitud-asesor';
+
+  export const urlNotificacionesFormularioContacto =
+    'http://localhost:5154/Notificaciones/correo-formulario-contacto-cliente'
 }
