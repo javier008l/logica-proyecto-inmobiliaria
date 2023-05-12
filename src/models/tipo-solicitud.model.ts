@@ -1,4 +1,4 @@
-import {Entity, model, property, hasMany} from '@loopback/repository';
+import {Entity, hasMany, model, property} from '@loopback/repository';
 import {Solicitud} from './solicitud.model';
 
 @model()
@@ -11,16 +11,22 @@ export class TipoSolicitud extends Entity {
   id?: number;
 
   @property({
-    type: 'boolean',
+    type: 'string',
     required: true,
   })
-  alquiler: boolean;
+  tipoSolicitud: string;
 
-  @property({
-    type: 'boolean',
-    required: true,
-  })
-  compra: boolean;
+  // @property({
+  //   type: 'boolean',
+  //   required: true,
+  // })
+  // alquiler: boolean;
+
+  // @property({
+  //   type: 'boolean',
+  //   required: true,
+  // })
+  // compra: boolean;
 
   @hasMany(() => Solicitud)
   solicitudes: Solicitud[];

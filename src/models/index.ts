@@ -15,3 +15,4 @@ export * from './variables-generales-del-sistema.model';
 export * from './formulario-asesor.model';
 export * from './formulario-contacto.model';
 export * from './datos-asignacion-inmueble-asesor.model';
+export * from './respuesta-solicitud.model';

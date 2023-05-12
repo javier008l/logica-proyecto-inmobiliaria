@@ -1,9 +1,8 @@
 import {
   belongsTo,
   Entity,
-  hasMany,
   model,
-  property,
+  property
 } from '@loopback/repository';
 import {Asesor} from './asesor.model';
 import {Cliente} from './cliente.model';
@@ -52,6 +51,12 @@ import {TipoSolicitud} from './tipo-solicitud.model';
         entityKey: 'id',
         foreignKey: 'inmuebleId',
       },
+      fk_solicitud_estado_idEstado: {
+        name: 'fk_solicitud_estado_idEstado',
+        entity: 'Estado',
+        entityKey: 'id',
+        foreignKey: 'estadoId',
+      },
     },
   },
 })
@@ -68,8 +73,8 @@ export class Solicitud extends Entity {
     required: true,
   })
   fechaSolicitud: string;
-  @hasMany(() => Estado)
-  estados: Estado[];
+  // @hasMany(() => Estado)
+  // estados: Estado[];
 
   @belongsTo(() => Cliente)
   clienteId: number;
@@ -82,6 +87,9 @@ export class Solicitud extends Entity {
 
   @belongsTo(() => TipoSolicitud)
   tipoSolicitudId: number;
+
+  @belongsTo(() => Estado)
+  estadoId: number;
 
   @belongsTo(() => TipoInmueble)
   tipoInmuebleId: number;

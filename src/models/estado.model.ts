@@ -29,28 +29,34 @@ export class Estado extends Entity {
   id?: number;
 
   @property({
-    type: 'boolean',
+    type: 'string',
     required: true,
   })
-  enviado: boolean;
+  nombre: string;
 
-  @property({
-    type: 'boolean',
-    required: true,
-  })
-  esEstudio: boolean;
+  // @property({
+  //   type: 'boolean',
+  //   required: true,
+  // })
+  // enviado: boolean;
 
-  @property({
-    type: 'boolean',
-    required: true,
-  })
-  aceptado: boolean;
+  // @property({
+  //   type: 'boolean',
+  //   required: true,
+  // })
+  // esEstudio: boolean;
 
-  @property({
-    type: 'boolean',
-    required: true,
-  })
-  aceptadoConCodeudor: boolean;
+  // @property({
+  //   type: 'boolean',
+  //   required: true,
+  // })
+  // aceptado: boolean;
+
+  // @property({
+  //   type: 'boolean',
+  //   required: true,
+  // })
+  // aceptadoConCodeudor: boolean;
 
   @property({
     type: 'boolean',
