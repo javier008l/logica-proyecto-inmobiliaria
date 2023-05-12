@@ -48,40 +48,40 @@ export class SitioWebController {
       if ((variables).length === 0) {
         throw new HttpErrors[500]("No hay variables del sistema para realizar el proceso");
       }
-      const correoAdministrador = variables[0].correoContactoAdministrador;
-      const nombreAdministrador = variables[0].nombreContactoAdministrador;
-      const asunto = "Contacto desde sitio web";
-      const mensaje = `Estimado ${nombreAdministrador}, se ha enviad un mensaje desde el sitio web con la siguiente información:
+      let cliente = await this.clienteRepositorio.findOne({
+        where: {
+          correo: datos.correo
+        }
+      })
+      if (cliente) {
+        const correoAdministrador = variables[0].correoContactoAdministrador;
+        const nombreAdministrador = variables[0].nombreContactoAdministrador;
+        const asunto = datos.asunto;
+        const mensaje = `Estimado ${nombreAdministrador}, se ha enviado un mensaje desde el sitio web con la siguiente información:
 
-      Nombre: ${datos.nombreCompleto}
+      Nombre: ${cliente.primerNombre}
+      apellido: ${cliente.primerApellido}
       Correo: ${datos.correo}
-      Celular: ${datos.celular}
-      Tipo de Mensaje: ${datos.tipoMensaje}
-
-      Texto del mensaje: ${datos.mensaje}
-
-      Dirrección del inmueble: ${datos.direccionInmueble}
-
-      Costo por el cual deseo vender o alquilar: ${datos.costo}
-
-      alquiler: ${datos.paraAlquiler}
-
-      venta: ${datos.paraVenta}
+      Celular: ${cliente.telefono}
 
       Hasta pronto,
       Equipo Técnico,
       `;
 
-      const datosContacto = {
-        correoDestino: correoAdministrador,
-        nombreDestino: nombreAdministrador,
-        asuntoCorreo: asunto,
-        contenidoCorreo: mensaje
-      };
+        const datosContacto = {
+          correoDestino: correoAdministrador,
+          nombreDestino: nombreAdministrador,
+          asuntoCorreo: asunto,
+          contenidoCorreo: mensaje
+        };
 
-      const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
-      console.log(enviado);
-      return enviado;
+        const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
+        console.log(enviado);
+        return enviado;
+      }else{
+        console.log("Cliente no encontrado")
+        return false
+      }
     } catch (e) {
       console.log(e);
       throw new HttpErrors[500]("Error de servidor para enviar mensaje")
@@ -198,7 +198,7 @@ export class SitioWebController {
           const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificacionesInfoAsesor);
           console.log(enviado);
           return enviado;
-        }else{
+        } else {
           console.log("correo asesor no encontrado");
           return false
         }

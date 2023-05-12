@@ -2,11 +2,12 @@ import {Entity , model, property} from '@loopback/repository';
 
 @model()
 export class FormularioContacto extends Entity {
+
   @property({
     type: 'string',
     required: true,
   })
-  nombreCompleto: string;
+  asunto: string;
 
   @property({
     type: 'string',
@@ -18,44 +19,24 @@ export class FormularioContacto extends Entity {
     type: 'string',
     required: true,
   })
-  celular: string;
+  tipo: string;
 
   @property({
     type: 'string',
     required: true,
   })
-  tipoMensaje: string;
+  contenido: string;
 
   @property({
     type: 'string',
     required: true,
   })
-  mensaje: string;
+  direccion: string;
 
   @property({
     type: 'string',
-    required: true,
   })
-  direccionInmueble: string;
-
-  @property({
-    type: 'number',
-    required: true,
-  })
-  costo: number;
-
-  @property({
-    type: 'boolean',
-    required: true,
-  })
-  paraAlquiler: boolean;
-
-  @property({
-    type: 'boolean',
-    required: true,
-  })
-  paraVenta: boolean;
-
+  ventaAlquiler?: string;
 
   constructor(data?: Partial<FormularioContacto>) {
     super(data);
