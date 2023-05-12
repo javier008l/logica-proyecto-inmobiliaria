@@ -108,7 +108,7 @@ export class AsesorController {
 
       const seguridad = this.servicioSeguridad.datosUsuario(datosAsesor, ConfiguracionSeguridad.enlaceMicroservicioSeguridad + "datos-asesor")
       console.log("esto va a: "+seguridad);
-      const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
+      const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificacionesCredencialesAsesor);
       console.log(enviado);
       return enviado;
     } catch {

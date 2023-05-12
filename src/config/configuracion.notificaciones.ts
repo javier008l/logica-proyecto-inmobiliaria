@@ -13,5 +13,8 @@ export namespace ConfiguracionNotificaciones {
     'http://localhost:5154/Notificaciones/correo-notificar-solicitud-asesor';
 
   export const urlNotificacionesFormularioContacto =
-    'http://localhost:5154/Notificaciones/correo-formulario-contacto-cliente'
+    'http://localhost:5154/Notificaciones/correo-formulario-contacto-cliente';
+
+    export const urlNotificacionesCredencialesAsesor =
+    'http://localhost:5154/Notificaciones/correo-credenciales-asesor';
 }
