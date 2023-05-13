@@ -262,25 +262,52 @@ export class SolicitudController {
 
     if (solicitud) {
       solicitud.estadoId = datos.estadoSolicitudId;
-      // request.comment = data.comment;
       await this.solicitudRepository.updateById(datos.solicitudId, solicitud);
+      // ******************************************************************
+      // ...
+
+      // Si el estado es Aceptada o Aceptada con codeudor
+      if (solicitud.estadoId === 4 || solicitud.estadoId === 3) {
+        let inmueble = await this.inmuebleRepositorio.findOne({
+          where: {id: solicitud.inmuebleId},
+        });
+
+        if (inmueble) {
+          // Buscar las demás solicitudes asociadas al inmueble (excluyendo la solicitud actual)
+          let otrasSolicitudes = await this.solicitudRepository.find({
+            where: {
+              inmuebleId: solicitud.inmuebleId,
+              // Excluir todas las demas solicitudes excepto la que  este en estado aceptado o aceptado con codeudor
+              estadoId: {nin: [3, 4]},
+            },
+          });
+
+          for (let otraSolicitud of otrasSolicitudes) {
+            // Se pasan a estado rechazado
+            otraSolicitud.estadoId = 5;
+            await this.solicitudRepository.updateById(otraSolicitud.id, otraSolicitud);
+          }
+        }
+      }
+
+      // *******************************************************************
+
       let cliente = await this.clienteRepositorio.findOne({
-        where: {
-          id: solicitud.clienteId
-        },
+        where: {id: solicitud.clienteId},
       });
+
       if (cliente) {
         let estado = await this.estadoRepositorio.findOne({
-          where: {
-            id: solicitud.estadoId
-          },
+          where: {id: solicitud.estadoId},
         });
+
+        /** */
         if (estado) {
           try {
             // Notificar al cliente
             let asunto = "Cambio de estado en su solicitud"
 
-            let mensaje = `<br>Estimado/a ${cliente.primerNombre}, su solicituden este momento se encuentra en estado:
+            let mensaje = `<br>Estimado/a ${cliente.primerNombre}, el estado de su solicitud actualmente es:
             ${estado.nombre}, para más información, puede revisar en nuestra pagina web.<br/>
 
 
@@ -302,11 +329,8 @@ export class SolicitudController {
           }
         }
       }
-
       return solicitud;
-
     }
     return null;
-
   }
 }
