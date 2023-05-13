@@ -300,6 +300,61 @@ export class AsesorController {
       console.log("El error es: " + err)
       throw new HttpErrors[500]("Error de servidor para enviar mensaje")
     }
+  }
+
+  @post('/eliminar-inmueble-asesor')
+  @response(200, {
+    description: 'se notifica al asesor que se le elimino un inmueble y se guarda en base de datos',
+    content: {'aplicacion/json': {schema: getModelSchemaRef(DatosAsignacionInmuebleAsesor)}},
+  })
+  async CambiarInmueble(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(DatosAsignacionInmuebleAsesor),
+        },
+      },
+    })
+    datos: DatosAsignacionInmuebleAsesor,
+  ): Promise<Object> {
+    try {
+      const asesor = await this.repositorioAsesor.findOne({
+        where: {
+          id: datos.idAsesor
+        }
+      })
+      if (asesor) {
+        let idDatos = await this.asesorRepository.updateById(asesor.id, {inmuebleId: undefined});
+        const correoAsesor = asesor.correo;
+        const nombreAsesor = asesor.primerNombre;
+        const asunto = "Eliminación de inmuble asesor";
+        const mensaje = `Estimado/a ${asesor.primerNombre}, se le ha eliminado un inmueble.
+
+        Id del nuevo inmueble:${datos.idInmueble} ,
+
+
+
+        Hasta pronto,
+        Equipo Técnico,
+        `;
+        const datosContacto = {
+          correoDestino: correoAsesor,
+          nombreDestino: nombreAsesor,
+          asuntoCorreo: asunto,
+          contenidoCorreo: mensaje
+        };
+
+        const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
+        console.log(enviado);
+        return enviado;
+      } else {
+        console.log("no se contro ninguna asesor con ese id:");
+        return datos.idAsesor;
+      }
+    } catch (err) {
+      console.log("El error es: " + err)
+      throw new HttpErrors[500]("Error de servidor para enviar mensaje")
+    }
 
   }
 
