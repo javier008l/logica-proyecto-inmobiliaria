@@ -239,7 +239,7 @@ export class SolicitudController {
     await this.solicitudRepository.deleteById(id);
   }
 
-  // Notficar el estado de la solicitud
+  // Notficar el estado de la solicitud y si alguna es aceptada que se rechace automaticamente
   @post('/notificacion-estado-solicitud')
   @response(200, {
     description: 'Notificar el estado de una solicitud',
@@ -263,8 +263,6 @@ export class SolicitudController {
     if (solicitud) {
       solicitud.estadoId = datos.estadoSolicitudId;
       await this.solicitudRepository.updateById(datos.solicitudId, solicitud);
-      // ******************************************************************
-      // ...
 
       // Si el estado es Aceptada o Aceptada con codeudor
       if (solicitud.estadoId === 4 || solicitud.estadoId === 3) {
@@ -286,12 +284,49 @@ export class SolicitudController {
             // Se pasan a estado rechazado
             otraSolicitud.estadoId = 5;
             await this.solicitudRepository.updateById(otraSolicitud.id, otraSolicitud);
+            // Notificar al cliente de la solicitud rechazada
+            let clienteRechazado = await this.clienteRepositorio.findOne({
+              where: {id: otraSolicitud.clienteId},
+            });
+
+            if (clienteRechazado) {
+              try {
+                // Construir el mensaje de notificación
+                const asuntoRechazo = "Rechazo de su solicitud";
+                const mensajeRechazo = `Estimado/a ${clienteRechazado.primerNombre}, su solicitud ha sido rechazada,
+                porque el inmueble ya fue tomado por otro cliente, para más información, puede revisar en nuestra página web.
+
+        Hasta pronto,
+        Equipo Técnico`;
+
+                const datosClienteRechazado = {
+                  correoDestino: clienteRechazado.correo,
+                  nombreDestino: clienteRechazado.primerNombre,
+                  asuntoCorreo: asuntoRechazo,
+                  contenidoCorreo: mensajeRechazo,
+                };
+
+                // Enviar la notificación al cliente de que su solicitud fue rechazada
+                await this.servicioNotificaciones.enviarNotificaciones(
+                  datosClienteRechazado,
+                  ConfiguracionNotificaciones.urlNotificacionesRechazoSolicitud
+                );
+                // notificar via Mensaje de texto
+                let datosSMS = {
+                  numeroDestino: clienteRechazado.telefono,
+                  contenidoMensaje: `Hola ${clienteRechazado.primerNombre}, la solicitud que realizo con
+                  la Inmobiliaria Tu Hogarha sido rechazada, porque el inmueble ya fue tomado por otro cliente`,
+                };
+                const url = ConfiguracionNotificaciones.urlNotificacionesSms;
+                this.servicioNotificaciones.enviarNotificaciones(datosSMS, url);
+
+              } catch (error) {
+                throw new HttpErrors[500]("Error de servidor al enviar el mensaje");
+              }
+            }
           }
         }
       }
-
-      // *******************************************************************
-
       let cliente = await this.clienteRepositorio.findOne({
         where: {id: solicitud.clienteId},
       });
@@ -322,8 +357,18 @@ export class SolicitudController {
               contenidoCorreo: mensaje
             };
 
-            let enviado = this.servicioNotificaciones.enviarNotificaciones(datosCliente, ConfiguracionNotificaciones.urlNotificacionesNuevaSolicitudCliente);
+            let enviado = this.servicioNotificaciones.enviarNotificaciones(datosCliente, ConfiguracionNotificaciones.urlNotificacionesCambioEstadoSolicitud);
             console.log(enviado);
+
+            // Notificar via Mensaje de texto
+            let datosSMS = {
+              numeroDestino: cliente.telefono,
+              contenidoMensaje: `Hola ${cliente.primerNombre}, la solicitud que acaba de realizar
+              con la Inmobiliaria Tu Hogar acaba de pasar a estado: ${estado.nombre}`,
+            };
+            const url = ConfiguracionNotificaciones.urlNotificacionesSms;
+            this.servicioNotificaciones.enviarNotificaciones(datosSMS, url);
+
           } catch (error) {
             throw new HttpErrors[500]("Error de servidor para enviar mensaje")
           }
@@ -334,3 +379,4 @@ export class SolicitudController {
     return null;
   }
 }
+
