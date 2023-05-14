@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {service} from '@loopback/core';
 import {
   Count,
@@ -20,6 +21,7 @@ import {
   response,
 } from '@loopback/rest';
 import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
+import {ConfiguracionSeguridad} from '../config/configuracion.seguridad';
 import {Solicitud} from '../models';
 import {RespuestaSolicitud} from '../models/respuesta-solicitud.model';
 import {AsesorRepository, ClienteRepository, EstadoRepository, InmuebleRepository, SolicitudRepository} from '../repositories';
@@ -41,10 +43,10 @@ export class SolicitudController {
     private servicioNotificaciones: NotificacionService,
   ) { }
 
-  // @authenticate({
-  //   strategy: "auth",
-  //   options: [ConfiguracionSeguridad.menuSolicitudId, ConfiguracionSeguridad.guardarAccion]
-  // })
+  @authenticate({
+    strategy: "auth",
+    options: [ConfiguracionSeguridad.menuSolicitudId, ConfiguracionSeguridad.guardarAccion]
+  })
   @post('/solicitud')
   @response(200, {
     description: 'Solicitud model instance',
@@ -105,8 +107,7 @@ export class SolicitudController {
             // notificar al usuario via sms
             let datosSMS = {
               numeroDestino: cliente.telefono,
-              contenidoMensaje: `Hola ${cliente.primerNombre}, la solicitud que acaba de realizar
-              con la Inmobiliaria Tu Hogar fue exitosa, actualmente se encuentra en estado enviado!`,
+              contenidoMensaje: `Hola ${cliente.primerNombre}, la solicitud que acaba de realizar con la Inmobiliaria Tu Hogar fue exitosa, actualmente se encuentra en estado enviado!`,
             };
             const url = ConfiguracionNotificaciones.urlNotificacionesSms;
             this.servicioNotificaciones.enviarNotificaciones(datosSMS, url);
@@ -314,8 +315,7 @@ export class SolicitudController {
                 // notificar via Mensaje de texto
                 let datosSMS = {
                   numeroDestino: clienteRechazado.telefono,
-                  contenidoMensaje: `Hola ${clienteRechazado.primerNombre}, la solicitud que realizo con
-                  la Inmobiliaria Tu Hogarha sido rechazada, porque el inmueble ya fue tomado por otro cliente`,
+                  contenidoMensaje: `Hola ${clienteRechazado.primerNombre}, la solicitud que realizo con la Inmobiliaria Tu Hogar ha sido rechazada, porque el inmueble ya fue tomado por otro cliente`,
                 };
                 const url = ConfiguracionNotificaciones.urlNotificacionesSms;
                 this.servicioNotificaciones.enviarNotificaciones(datosSMS, url);
@@ -336,7 +336,6 @@ export class SolicitudController {
           where: {id: solicitud.estadoId},
         });
 
-        /** */
         if (estado) {
           try {
             // Notificar al cliente
@@ -378,5 +377,29 @@ export class SolicitudController {
     }
     return null;
   }
+
+  @get('/verificar-solicitudes-cliente')
+  @response(200, {
+    description: 'Array of Solicitud model instances for the specified client',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Solicitud, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findByClienteId(
+    @param.path.number('clienteId') clienteId: number,
+  ): Promise<Solicitud[]> {
+    const filter: Filter<Solicitud> = {
+      where: {
+        clienteId: clienteId,
+      },
+    };
+    return this.solicitudRepository.find(filter);
+  }
+
 }
 

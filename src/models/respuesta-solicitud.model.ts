@@ -9,12 +9,6 @@ export class RespuestaSolicitud extends Model {
   solicitudId: number;
 
   @property({
-    type: 'string',
-    required: true,
-  })
-  comentario: string;
-
-  @property({
     type: 'number',
     required: true,
   })

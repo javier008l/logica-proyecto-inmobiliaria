@@ -68,10 +68,7 @@ export class InmueblesController {
   ): Promise<Count> {
     return this.inmuebleRepository.count(where);
   }
-  // @authenticate({
-  //   strategy: "auth",
-  //   options: [ConfiguracionSeguridad.menuInmuebleId, ConfiguracionSeguridad.listarAccion]
-  // })
+
   @get('/inmueble')
   @response(200, {
     description: 'Array of Inmueble model instances',
@@ -161,4 +158,49 @@ export class InmueblesController {
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.inmuebleRepository.deleteById(id);
   }
+  // Metodo que muestra los inmuebles que estan para la Venta
+  @get('/inmueble-para-venta')
+  @response(200, {
+    description: 'Array of Inmueble model instances for venta',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Inmueble, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findByVenta(): Promise<Inmueble[]> {
+    const filter: Filter<Inmueble> = {
+      where: {
+        paraVenta: true,
+      },
+    };
+    return this.inmuebleRepository.find(filter);
+  }
+
+  // Metodo que muestra los inmuebles que estan para Alquiler
+  @get('/inmueble-para-alquiler')
+  @response(200, {
+    description: 'Array of Inmueble model instances for alquiler',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Inmueble, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findByAlquiler(): Promise<Inmueble[]> {
+    const filter: Filter<Inmueble> = {
+      where: {
+        paraAlquiler: true,
+      },
+    };
+    return this.inmuebleRepository.find(filter);
+  }
+
+
 }
