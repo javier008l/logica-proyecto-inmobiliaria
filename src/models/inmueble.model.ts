@@ -61,6 +61,11 @@ export class Inmueble extends Entity {
   })
   foto?: string;
 
+  @property({
+    type: 'string',
+  })
+  correoAsesor?: string;
+
   @belongsTo(() => TipoInmueble)
   tipoInmuebleId: number;
 

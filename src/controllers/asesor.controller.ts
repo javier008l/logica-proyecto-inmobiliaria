@@ -22,8 +22,8 @@ import {
 } from '@loopback/rest';
 import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
 import {ConfiguracionSeguridad} from '../config/configuracion.seguridad';
-import {Asesor, DatosAsignacionInmuebleAsesor} from '../models';
-import {AsesorRepository} from '../repositories';
+import {Asesor, DatosAsignacionInmuebleAsesor, Inmueble, VariablesGeneralesDelSistema} from '../models';
+import {AsesorRepository, InmuebleRepository, VariablesGeneralesDelSistemaRepository} from '../repositories';
 import {NotificacionService, SeguridadService} from '../services';
 
 export class AsesorController {
@@ -35,7 +35,11 @@ export class AsesorController {
     @repository(AsesorRepository)
     private repositorioAsesor: AsesorRepository,
     @service(SeguridadService)
-    private servicioSeguridad: SeguridadService
+    private servicioSeguridad: SeguridadService,
+    @repository(VariablesGeneralesDelSistemaRepository)
+    private variablesRepository: VariablesGeneralesDelSistemaRepository,
+    @repository(InmuebleRepository)
+    private inmuebleRepository: InmuebleRepository
   ) { }
 
   /**
@@ -107,7 +111,7 @@ export class AsesorController {
       console.log(datos);
 
       const seguridad = this.servicioSeguridad.datosUsuario(datosAsesor, ConfiguracionSeguridad.enlaceMicroservicioSeguridad + "datos-asesor")
-      console.log("esto va a: "+seguridad);
+      console.log("esto va a: " + seguridad);
       const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificacionesCredencialesAsesor);
       console.log(enviado);
       return enviado;
@@ -356,6 +360,73 @@ export class AsesorController {
       throw new HttpErrors[500]("Error de servidor para enviar mensaje")
     }
 
+  }
+
+  @post('/crear-inmueble-asesor')
+  @response(200, {
+    description: 'Envio del mensaje del formulario de contacto',
+    content: {'aplicacion/json': {schema: getModelSchemaRef(Inmueble)}},
+  })
+  async ValidarPermisosDeUsuario(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(Inmueble),
+        },
+      },
+    })
+    datos: Inmueble,
+  ): Promise<boolean> {
+    try {
+      let inmuble = await this.inmuebleRepository.create({...datos, id: undefined});
+      console.log("este el inmueble creado" + inmuble);
+
+      const variables: VariablesGeneralesDelSistema[] = await this.variablesRepository.find();
+      if ((variables).length === 0) {
+        throw new HttpErrors[500]("No hay variables del sistema para realizar el proceso");
+      }
+
+      let asesor = await this.asesorRepository.findOne({
+        where: {
+          correo: datos.correoAsesor
+        }
+      })
+      if (asesor) {
+        const correoAdministrador = variables[0].correoContactoAdministrador;
+        const nombreAdministrador = variables[0].nombreContactoAdministrador;
+        const asunto = "Asesor ha creado un nuevo inmueble";
+        const mensaje = `Estimado ${nombreAdministrador}, se ha enviado un
+        mensaje desde el sitio web un asesor acabá de crear un nuevo inmueble:
+        -----------
+        Id de inmueble: ${datos.id}, ------------
+        Id de Asesor: ${asesor.id}------
+
+      Hasta pronto,
+      Equipo Técnico,
+      `;
+
+        const datosContacto = {
+          correoDestino: correoAdministrador,
+          nombreDestino: nombreAdministrador,
+          asuntoCorreo: asunto,
+          contenidoCorreo: mensaje
+        };
+
+        if (inmuble) {
+          let idAsesor = await this.asesorRepository.updateById(asesor.id, {inmuebleId: datos.id});
+          console.log("este id se ha agregado a asesor" + idAsesor);
+        }
+
+        const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificacionesFormularioContacto);
+        console.log(enviado);
+        return enviado;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      console.log(e);
+      throw new HttpErrors[500]("Error de servidor para enviar mensaje")
+    }
   }
 
 }
