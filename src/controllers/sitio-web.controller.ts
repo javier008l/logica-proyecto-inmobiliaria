@@ -243,9 +243,15 @@ export class SitioWebController {
     })
     datos: SolicitudesCliente,
   ): Promise<Solicitud[]> {
+    let cliente = await this.clienteRepositorio.findOne({
+      where: {
+        correo: datos.correoCliente
+      }
+    })
+
     const filter: Filter<Solicitud> = {
       where: {
-        clienteId: datos.idCliente,
+        clienteId: cliente?.id,
       },
     };
     if (filter) {
