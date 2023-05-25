@@ -15,3 +15,4 @@ export * from './tipo-inmueble.model';
 export * from './tipo-solicitud.model';
 export * from './variables-generales-del-sistema.model';
 
+export * from './solicitudes-cliente.model';

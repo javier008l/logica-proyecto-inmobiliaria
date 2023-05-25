@@ -1,11 +1,11 @@
 // Uncomment these imports to begin using these cool features!
 
 import {service} from '@loopback/core';
-import {repository} from '@loopback/repository';
-import {HttpErrors, getModelSchemaRef, post, requestBody, response} from '@loopback/rest';
+import {Filter, repository} from '@loopback/repository';
+import {HttpErrors, getModelSchemaRef, post, requestBody, response, get} from '@loopback/rest';
 import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
-import {Asesor, ContactoCliente, FormularioAsesor, FormularioContacto, VariablesGeneralesDelSistema} from '../models';
-import {AsesorRepository, ClienteRepository, InmuebleRepository, VariablesGeneralesDelSistemaRepository} from '../repositories';
+import {Asesor, ContactoCliente, FormularioAsesor, FormularioContacto, Solicitud, SolicitudesCliente, VariablesGeneralesDelSistema} from '../models';
+import {AsesorRepository, ClienteRepository, InmuebleRepository, SolicitudRepository, VariablesGeneralesDelSistemaRepository} from '../repositories';
 import {NotificacionService, SeguridadService} from '../services';
 
 // import {inject} from '@loopback/core';
@@ -25,6 +25,8 @@ export class SitioWebController {
     private clienteRepositorio: ClienteRepository,
     @repository(InmuebleRepository)
     private inmuebleRepositorio: InmuebleRepository,
+    @repository(SolicitudRepository)
+    private repositorioSolicitud: SolicitudRepository
   ) {
   }
 
@@ -217,5 +219,43 @@ export class SitioWebController {
       throw new HttpErrors[500]("Error de servidor para enviar mensaje")
     }
   }
+
+  // Metodo que muestra las solicitudes de cliente
+  @get('/solicitudes-cliente')
+  @response(200, {
+    description: 'solicitudes del cliente',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Solicitud, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findBySolicitud(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(SolicitudesCliente),
+        },
+      },
+    })
+    datos: SolicitudesCliente,
+  ): Promise<Solicitud[]> {
+    const filter: Filter<Solicitud> = {
+      where: {
+        clienteId: datos.idCliente,
+      },
+    };
+    if (filter) {
+      console.log("Este es el filter: "+ filter)
+      return this.repositorioSolicitud.find(filter);
+    } else {
+      throw new HttpErrors[500]("No se encuentra cliente")
+    }
+
+  }
+
 
 }
