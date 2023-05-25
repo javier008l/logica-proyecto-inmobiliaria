@@ -159,7 +159,7 @@ export class InmueblesController {
     await this.inmuebleRepository.deleteById(id);
   }
   // Metodo que muestra los inmuebles que estan para la Venta
-  @get('/inmueble-para-venta')
+  @get('/casa-para-venta')
   @response(200, {
     description: 'Array of Inmueble model instances for venta',
     content: {
@@ -175,6 +175,7 @@ export class InmueblesController {
     const filter: Filter<Inmueble> = {
       where: {
         paraVenta: true,
+        // tipoInmuebleId: 1,
       },
     };
     return this.inmuebleRepository.find(filter);

@@ -270,8 +270,15 @@ export class SolicitudController {
         let inmueble = await this.inmuebleRepositorio.findOne({
           where: {id: solicitud.inmuebleId},
         });
+        // let inmueble = await this.inmuebleRepositorio.findOne({
+        //   where: {id: solicitud.inmuebleId},
+        // });
 
         if (inmueble) {
+          // Establecer los atributos paraAlquiler y paraCompra como false
+          inmueble.paraAlquiler = false;
+          inmueble.paraVenta = false;
+          await this.inmuebleRepositorio.updateById(solicitud.inmuebleId, inmueble);
           // Buscar las demás solicitudes asociadas al inmueble (excluyendo la solicitud actual)
           let otrasSolicitudes = await this.solicitudRepository.find({
             where: {
@@ -376,29 +383,6 @@ export class SolicitudController {
       return solicitud;
     }
     return null;
-  }
-
-  @get('/verificar-solicitudes-cliente')
-  @response(200, {
-    description: 'Array of Solicitud model instances for the specified client',
-    content: {
-      'application/json': {
-        schema: {
-          type: 'array',
-          items: getModelSchemaRef(Solicitud, {includeRelations: true}),
-        },
-      },
-    },
-  })
-  async findByClienteId(
-    @param.path.number('clienteId') clienteId: number,
-  ): Promise<Solicitud[]> {
-    const filter: Filter<Solicitud> = {
-      where: {
-        clienteId: clienteId,
-      },
-    };
-    return this.solicitudRepository.find(filter);
   }
 
 }
