@@ -378,9 +378,6 @@ export class AsesorController {
     datos: Inmueble,
   ): Promise<boolean> {
     try {
-      let inmuble = await this.inmuebleRepository.create({...datos, id: undefined});
-      console.log("este el inmueble creado" + inmuble);
-
       const variables: VariablesGeneralesDelSistema[] = await this.variablesRepository.find();
       if ((variables).length === 0) {
         throw new HttpErrors[500]("No hay variables del sistema para realizar el proceso");
@@ -392,13 +389,16 @@ export class AsesorController {
         }
       })
       if (asesor) {
+        let inmuble = await this.inmuebleRepository.create({...datos, id: undefined});
+        console.log("este el inmueble creado " + inmuble.id);
+
         const correoAdministrador = variables[0].correoContactoAdministrador;
         const nombreAdministrador = variables[0].nombreContactoAdministrador;
         const asunto = "Asesor ha creado un nuevo inmueble";
         const mensaje = `Estimado ${nombreAdministrador}, se ha enviado un
         mensaje desde el sitio web un asesor acabá de crear un nuevo inmueble:
         -----------
-        Id de inmueble: ${datos.id}, ------------
+        Id de inmueble: ${inmuble.id}, ------------
         Id de Asesor: ${asesor.id}------
 
       Hasta pronto,
@@ -413,8 +413,8 @@ export class AsesorController {
         };
 
         if (inmuble) {
-          let idAsesor = await this.asesorRepository.updateById(asesor.id, {inmuebleId: datos.id});
-          console.log("este id se ha agregado a asesor" + idAsesor);
+          let idAsesor = await this.asesorRepository.updateById(asesor.id, {inmuebleId: inmuble.id});
+          console.log("este id se ha agregado a asesor " + idAsesor);
         }
 
         const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificacionesFormularioContacto);
