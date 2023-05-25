@@ -221,7 +221,7 @@ export class SitioWebController {
   }
 
   // Metodo que muestra las solicitudes de cliente
-  @get('/solicitudes-cliente')
+  @post('/solicitudes-cliente')
   @response(200, {
     description: 'solicitudes del cliente',
     content: {
