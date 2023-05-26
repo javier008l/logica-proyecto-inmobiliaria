@@ -158,10 +158,11 @@ export class InmueblesController {
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.inmuebleRepository.deleteById(id);
   }
-  // Metodo que muestra los inmuebles que estan para la Venta
-  @get('/casa-para-venta')
+
+
+  @get('/listar-inmuebles')
   @response(200, {
-    description: 'Array of Inmueble model instances for venta',
+    description: 'Array of Inmueble model instances',
     content: {
       'application/json': {
         schema: {
@@ -171,37 +172,36 @@ export class InmueblesController {
       },
     },
   })
-  async findByVenta(): Promise<Inmueble[]> {
+  async findByTipoInmueble(
+    @param.query.string('tipo') tipo: string,
+    @param.query.number('tipoInmuebleId') tipoInmuebleId: number,
+    @param.query.number('limit') limit?: number
+  ): Promise<Inmueble[]> {
     const filter: Filter<Inmueble> = {
-      where: {
+      where: {},
+      limit: limit || undefined,
+    };
+
+    if (tipo === 'paraVenta') {
+      filter.where = {
+        ...filter.where,
         paraVenta: true,
-        // tipoInmuebleId: 1,
-      },
-    };
-    return this.inmuebleRepository.find(filter);
-  }
-
-  // Metodo que muestra los inmuebles que estan para Alquiler
-  @get('/inmueble-para-alquiler')
-  @response(200, {
-    description: 'Array of Inmueble model instances for alquiler',
-    content: {
-      'application/json': {
-        schema: {
-          type: 'array',
-          items: getModelSchemaRef(Inmueble, {includeRelations: true}),
-        },
-      },
-    },
-  })
-  async findByAlquiler(): Promise<Inmueble[]> {
-    const filter: Filter<Inmueble> = {
-      where: {
+      };
+    } else if (tipo === 'paraAlquiler') {
+      filter.where = {
+        ...filter.where,
         paraAlquiler: true,
-      },
-    };
+      };
+    }
+
+    if (tipoInmuebleId) {
+      filter.where = {
+        ...filter.where,
+        tipoInmuebleId: tipoInmuebleId,
+      };
+    }
+
     return this.inmuebleRepository.find(filter);
   }
-
 
 }
