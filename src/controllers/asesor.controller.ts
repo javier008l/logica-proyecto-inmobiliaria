@@ -22,7 +22,7 @@ import {
 } from '@loopback/rest';
 import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
 import {ConfiguracionSeguridad} from '../config/configuracion.seguridad';
-import {Asesor, DatosAsignacionInmuebleAsesor, Inmueble, VariablesGeneralesDelSistema} from '../models';
+import {Asesor, AsesorId, DatosAsignacionInmuebleAsesor, Inmueble, VariablesGeneralesDelSistema} from '../models';
 import {AsesorRepository, InmuebleRepository, VariablesGeneralesDelSistemaRepository} from '../repositories';
 import {NotificacionService, SeguridadService} from '../services';
 
@@ -338,9 +338,9 @@ export class AsesorController {
         }
       })
       if (asesor) {
-        let idDato =  asesor.inmuebleId?.indexOf(datos.idInmueble);
+        let idDato = asesor.inmuebleId?.indexOf(datos.idInmueble);
 
-        if(idDato !== -1){
+        if (idDato !== -1) {
           asesor.inmuebleId?.splice(idDato!, 1);
           await this.repositorioAsesor.update(asesor);
         }
@@ -451,6 +451,45 @@ export class AsesorController {
       console.log(e);
       throw new HttpErrors[500]("Error de servidor para enviar mensaje")
     }
+  }
+
+  @post('/ver-inmuebles-asesor')
+  @response(200, {
+    description: 'Inmuebles que tiene asignados un asesor',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Asesor),
+        },
+      },
+    },
+  })
+  async inmueblesDeAsesor(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(AsesorId),
+        },
+      },
+    })
+    datos: AsesorId,
+  ): Promise<Inmueble[]> {
+    let asesor = await this.asesorRepository.findById(datos.idAsesor);
+
+    if (!asesor) {
+      throw new HttpErrors.NotFound('No se encuentra el asesor');
+    }
+    const inmuebles = await this.inmuebleRepository.find({
+      where: {
+        id: {
+          inq: asesor.inmuebleId,
+        },
+      },
+    });
+
+    return inmuebles;
+
   }
 
 }
