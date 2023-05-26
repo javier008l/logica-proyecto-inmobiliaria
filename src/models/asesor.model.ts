@@ -2,18 +2,7 @@ import {Entity, belongsTo, hasMany, model, property} from '@loopback/repository'
 import {Inmueble} from './inmueble.model';
 import {Solicitud} from './solicitud.model';
 
-@model({
-  settings: {
-    foreignKeys: {
-      fk_asesor_idInmueble: {
-        name: 'fk_asesor_idInmueble',
-        entity: 'Inmueble',
-        entityKey: 'id',
-        foreignKey: 'inmuebleId',
-      },
-    }
-  }
-})
+@model()
 export class Asesor extends Entity {
   @property({
     type: 'number',
@@ -68,11 +57,17 @@ export class Asesor extends Entity {
   })
   direccion: string;
 
+  @property({
+    type: 'array',
+    itemType: 'number',
+    required: false,
+  })
+  inmuebleId?: number[];
+
   @hasMany(() => Solicitud)
   solicitudes: Solicitud[];
 
-  @belongsTo(() => Inmueble)
-  inmuebleId: number;
+
 
   constructor(data?: Partial<Asesor>) {
     super(data);

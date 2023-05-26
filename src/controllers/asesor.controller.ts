@@ -22,7 +22,7 @@ import {
 } from '@loopback/rest';
 import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
 import {ConfiguracionSeguridad} from '../config/configuracion.seguridad';
-import {Asesor, DatosAsignacionInmuebleAsesor, Inmueble, VariablesGeneralesDelSistema} from '../models';
+import {Asesor, AsesorId, DatosAsignacionInmuebleAsesor, Inmueble, VariablesGeneralesDelSistema} from '../models';
 import {AsesorRepository, InmuebleRepository, VariablesGeneralesDelSistemaRepository} from '../repositories';
 import {NotificacionService, SeguridadService} from '../services';
 
@@ -272,8 +272,17 @@ export class AsesorController {
           id: datos.idAsesor
         }
       })
+      let idAsesor = await this.repositorioAsesor.findById(datos.idAsesor)
+      if (idAsesor.inmuebleId === null) {
+        idAsesor.inmuebleId = [];
+      }
+      if (idAsesor && idAsesor.inmuebleId) {
+        idAsesor.inmuebleId.push(datos.idInmueble);
+        await this.repositorioAsesor.update(idAsesor);
+      } else {
+        console.log("no se encontro el asesor");
+      }
       if (asesor) {
-        let idDatos = await this.asesorRepository.updateById(asesor.id, {inmuebleId: datos.idInmueble});
         const correoAsesor = asesor.correo;
         const nombreAsesor = asesor.primerNombre;
         const asunto = "Asignación de inmuble asesor";
@@ -291,6 +300,7 @@ export class AsesorController {
           nombreDestino: nombreAsesor,
           asuntoCorreo: asunto,
           contenidoCorreo: mensaje
+
         };
 
         const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
@@ -311,7 +321,7 @@ export class AsesorController {
     description: 'se notifica al asesor que se le elimino un inmueble y se guarda en base de datos',
     content: {'aplicacion/json': {schema: getModelSchemaRef(DatosAsignacionInmuebleAsesor)}},
   })
-  async CambiarInmueble(
+  async EliminarInmueble(
     @requestBody({
       content: {
         'application/json': {
@@ -328,7 +338,13 @@ export class AsesorController {
         }
       })
       if (asesor) {
-        let idDatos = await this.asesorRepository.updateById(asesor.id, {inmuebleId: undefined});
+        let idDato = asesor.inmuebleId?.indexOf(datos.idInmueble);
+
+        if (idDato !== -1) {
+          asesor.inmuebleId?.splice(idDato!, 1);
+          await this.repositorioAsesor.update(asesor);
+        }
+
         const correoAsesor = asesor.correo;
         const nombreAsesor = asesor.primerNombre;
         const asunto = "Eliminación de inmuble asesor";
@@ -413,8 +429,16 @@ export class AsesorController {
         };
 
         if (inmuble) {
-          let idAsesor = await this.asesorRepository.updateById(asesor.id, {inmuebleId: inmuble.id});
-          console.log("este id se ha agregado a asesor " + idAsesor);
+          let idAsesor = await this.repositorioAsesor.findById(asesor.id)
+          if (idAsesor.inmuebleId === null) {
+            idAsesor.inmuebleId = [];
+          }
+          if (idAsesor && idAsesor.inmuebleId) {
+            idAsesor.inmuebleId.push(inmuble.id!);
+            await this.repositorioAsesor.update(idAsesor);
+          } else {
+            console.log("no se encontro el asesor");
+          }
         }
 
         const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificacionesFormularioContacto);
@@ -427,6 +451,45 @@ export class AsesorController {
       console.log(e);
       throw new HttpErrors[500]("Error de servidor para enviar mensaje")
     }
+  }
+
+  @post('/ver-inmuebles-asesor')
+  @response(200, {
+    description: 'Inmuebles que tiene asignados un asesor',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Asesor),
+        },
+      },
+    },
+  })
+  async inmueblesDeAsesor(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(AsesorId),
+        },
+      },
+    })
+    datos: AsesorId,
+  ): Promise<Inmueble[]> {
+    let asesor = await this.asesorRepository.findById(datos.idAsesor);
+
+    if (!asesor) {
+      throw new HttpErrors.NotFound('No se encuentra el asesor');
+    }
+    const inmuebles = await this.inmuebleRepository.find({
+      where: {
+        id: {
+          inq: asesor.inmuebleId,
+        },
+      },
+    });
+
+    return inmuebles;
+
   }
 
 }
