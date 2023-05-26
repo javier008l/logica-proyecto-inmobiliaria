@@ -321,7 +321,7 @@ export class AsesorController {
     description: 'se notifica al asesor que se le elimino un inmueble y se guarda en base de datos',
     content: {'aplicacion/json': {schema: getModelSchemaRef(DatosAsignacionInmuebleAsesor)}},
   })
-  async CambiarInmueble(
+  async EliminarInmueble(
     @requestBody({
       content: {
         'application/json': {
@@ -338,7 +338,13 @@ export class AsesorController {
         }
       })
       if (asesor) {
-        let idDatos = await this.asesorRepository.updateById(asesor.id, {inmuebleId: undefined});
+        let idDato =  asesor.inmuebleId?.indexOf(datos.idInmueble);
+
+        if(idDato !== -1){
+          asesor.inmuebleId?.splice(idDato!, 1);
+          await this.repositorioAsesor.update(asesor);
+        }
+
         const correoAsesor = asesor.correo;
         const nombreAsesor = asesor.primerNombre;
         const asunto = "Eliminación de inmuble asesor";
