@@ -272,8 +272,17 @@ export class AsesorController {
           id: datos.idAsesor
         }
       })
+      let idAsesor = await this.repositorioAsesor.findById(datos.idAsesor)
+      if (idAsesor.inmuebleId === null) {
+        idAsesor.inmuebleId = [];
+      }
+      if (idAsesor && idAsesor.inmuebleId) {
+        idAsesor.inmuebleId.push(datos.idInmueble);
+        await this.repositorioAsesor.update(idAsesor);
+      } else {
+        console.log("no se encontro el asesor");
+      }
       if (asesor) {
-        let idDatos = await this.asesorRepository.updateById(asesor.id, {inmuebleId: datos.idInmueble});
         const correoAsesor = asesor.correo;
         const nombreAsesor = asesor.primerNombre;
         const asunto = "Asignación de inmuble asesor";
@@ -291,6 +300,7 @@ export class AsesorController {
           nombreDestino: nombreAsesor,
           asuntoCorreo: asunto,
           contenidoCorreo: mensaje
+
         };
 
         const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
@@ -413,8 +423,16 @@ export class AsesorController {
         };
 
         if (inmuble) {
-          let idAsesor = await this.asesorRepository.updateById(asesor.id, {inmuebleId: inmuble.id});
-          console.log("este id se ha agregado a asesor " + idAsesor);
+          let idAsesor = await this.repositorioAsesor.findById(asesor.id)
+          if (idAsesor.inmuebleId === null) {
+            idAsesor.inmuebleId = [];
+          }
+          if (idAsesor && idAsesor.inmuebleId) {
+            idAsesor.inmuebleId.push(inmuble.id!);
+            await this.repositorioAsesor.update(idAsesor);
+          } else {
+            console.log("no se encontro el asesor");
+          }
         }
 
         const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificacionesFormularioContacto);

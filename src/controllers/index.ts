@@ -1,5 +1,4 @@
 export * from './administrador-de-archivos.controller';
-export * from './asesor-inmueble.controller';
 export * from './asesor-solicitud.controller';
 export * from './asesor.controller';
 export * from './ciudad-departamento.controller';
