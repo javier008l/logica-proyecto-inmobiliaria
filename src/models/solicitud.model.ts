@@ -83,7 +83,7 @@ export class Solicitud extends Entity {
   asesorId: number;
 
   @belongsTo(() => Codeudor)
-  codeudorId: number;
+  codeudorId?: number;
 
   @belongsTo(() => TipoSolicitud)
   tipoSolicitudId: number;

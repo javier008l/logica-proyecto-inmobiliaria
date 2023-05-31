@@ -43,10 +43,10 @@ export class SolicitudController {
     private servicioNotificaciones: NotificacionService,
   ) { }
 
-  @authenticate({
-    strategy: "auth",
-    options: [ConfiguracionSeguridad.menuSolicitudId, ConfiguracionSeguridad.guardarAccion]
-  })
+  // @authenticate({
+  //   strategy: "auth",
+  //   options: [ConfiguracionSeguridad.menuSolicitudId, ConfiguracionSeguridad.guardarAccion]
+  // })
   @post('/solicitud')
   @response(200, {
     description: 'Solicitud model instance',
