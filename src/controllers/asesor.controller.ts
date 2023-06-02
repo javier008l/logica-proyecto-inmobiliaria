@@ -475,7 +475,11 @@ export class AsesorController {
     })
     datos: AsesorId,
   ): Promise<Inmueble[]> {
-    let asesor = await this.asesorRepository.findById(datos.idAsesor);
+    let asesor = await this.asesorRepository.findOne({
+      where:{
+        correo : datos.correoAsesor
+      }
+    });
 
     if (!asesor) {
       throw new HttpErrors.NotFound('No se encuentra el asesor');

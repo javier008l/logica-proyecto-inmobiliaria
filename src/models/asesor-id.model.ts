@@ -3,10 +3,10 @@ import {Entity, model, property} from '@loopback/repository';
 @model()
 export class AsesorId extends Entity {
   @property({
-    type: 'number',
+    type: 'string',
     required: true,
   })
-  idAsesor: number;
+  correoAsesor: string;
 
 
   constructor(data?: Partial<AsesorId>) {
