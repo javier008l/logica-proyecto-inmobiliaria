@@ -62,9 +62,15 @@ export class Inmueble extends Entity {
   foto?: string;
 
   @property({
+    type: 'Date',
+  })
+  fecha?: Date;
+
+  @property({
     type: 'string',
   })
   correoAsesor?: string;
+
 
   @belongsTo(() => TipoInmueble)
   tipoInmuebleId: number;
