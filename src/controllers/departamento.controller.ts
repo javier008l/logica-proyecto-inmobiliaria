@@ -11,6 +11,7 @@ import {
   del,
   get,
   getModelSchemaRef,
+  HttpErrors,
   param,
   patch,
   post,
@@ -19,7 +20,7 @@ import {
   response,
 } from '@loopback/rest';
 import {ConfiguracionSeguridad} from '../config/configuracion.seguridad';
-import {Departamento} from '../models';
+import {Departamento, NombreDepartamento} from '../models';
 import {DepartamentoRepository} from '../repositories';
 
 export class DepartamentoController {
@@ -153,4 +154,32 @@ export class DepartamentoController {
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.departamentoRepository.deleteById(id);
   }
+
+  @post('/nombre-departamento')
+  @response(200, {
+    description: '',
+    content: {'application/json': {schema: getModelSchemaRef(Departamento)}},
+  })
+  async buscarClienteporCorreo(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(NombreDepartamento),
+        },
+      },
+    })
+    datos: NombreDepartamento,
+  ): Promise<Number> {
+    let departamento = await this.departamentoRepository.findOne({
+      where:{
+        nombre: datos.nombreDepartamento
+      }
+    });
+
+    if(!departamento){
+      throw new HttpErrors.NotFound('No se encuentra el cliente');
+    }
+    return departamento.id as number;
+  }
+
 }
