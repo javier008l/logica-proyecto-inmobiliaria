@@ -10,6 +10,7 @@ import {
   del,
   get,
   getModelSchemaRef,
+  HttpErrors,
   param,
   patch,
   post,
@@ -17,7 +18,7 @@ import {
   requestBody,
   response,
 } from '@loopback/rest';
-import {Cliente} from '../models';
+import {AsesorId, Cliente} from '../models';
 import {ClienteRepository} from '../repositories';
 
 export class ClienteController {
@@ -169,4 +170,32 @@ export class ClienteController {
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.clienteRepository.deleteById(id);
   }
+
+  @post('/cliente-correo')
+  @response(200, {
+    description: 'Cliente model instance',
+    content: {'application/json': {schema: getModelSchemaRef(Cliente)}},
+  })
+  async buscarClienteporCorreo(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(AsesorId),
+        },
+      },
+    })
+    datos: AsesorId,
+  ): Promise<Number> {
+    let cliente = await this.clienteRepository.findOne({
+      where:{
+        correo: datos.correoAsesor
+      }
+    });
+
+    if(!cliente){
+      throw new HttpErrors.NotFound('No se encuentra el cliente');
+    }
+    return cliente.id as number;
+  }
+
 }
