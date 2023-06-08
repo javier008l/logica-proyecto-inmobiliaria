@@ -17,3 +17,4 @@ export * from './variables-generales-del-sistema.model';
 
 export * from './solicitudes-cliente.model';
 export * from './asesor-id.model';
+export * from './paginador-cliente.model';
