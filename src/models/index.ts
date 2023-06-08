@@ -11,11 +11,9 @@ export * from './estado.model';
 export * from './formulario-asesor.model';
 export * from './formulario-contacto.model';
 export * from './inmueble.model';
-export * from './nombre-departamento.model';
 export * from './solicitud.model';
 export * from './solicitudes-cliente.model';
 export * from './tipo-inmueble.model';
 export * from './tipo-solicitud.model';
 export * from './variables-generales-del-sistema.model';
-
 
