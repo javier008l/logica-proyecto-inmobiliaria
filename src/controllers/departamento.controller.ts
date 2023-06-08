@@ -29,10 +29,10 @@ export class DepartamentoController {
     public departamentoRepository: DepartamentoRepository,
   ) { }
 
-  @authenticate({
-    strategy: "auth",
-    options: [ConfiguracionSeguridad.menuDepartamentoId, ConfiguracionSeguridad.guardarAccion]
-  })
+  // @authenticate({
+  //   strategy: "auth",
+  //   options: [ConfiguracionSeguridad.menuDepartamentoId, ConfiguracionSeguridad.guardarAccion]
+  // })
   @post('/departamento')
   @response(200, {
     description: 'Departamento model instance',
