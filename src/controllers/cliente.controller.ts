@@ -45,7 +45,7 @@ export class ClienteController {
     datos: any,
   ): Promise<Cliente> {
     console.log(datos)
-    let created = await this.clienteRepository.create(datos);
+    const created = await this.clienteRepository.create(datos);
     console.log(created);
     return created;
   }
@@ -105,9 +105,9 @@ export class ClienteController {
   async find(
     @param.filter(Cliente) filter?: Filter<Cliente>,
   ): Promise<object> {
-    let total: number = (await this.clienteRepository.count()).count;
-    let registros: Cliente[] = await this.clienteRepository.find(filter);
-    let repuesta = {
+    const total: number = (await this.clienteRepository.count()).count;
+    const registros: Cliente[] = await this.clienteRepository.find(filter);
+    const repuesta = {
       registros: registros,
       totalRegistros: total,
     };
@@ -201,7 +201,7 @@ export class ClienteController {
     })
     datos: AsesorId,
   ): Promise<Number> {
-    let cliente = await this.clienteRepository.findOne({
+    const cliente = await this.clienteRepository.findOne({
       where: {
         correo: datos.correoAsesor
       }

@@ -28,10 +28,17 @@ export class CiudadController {
     public ciudadRepository: CiudadRepository,
   ) { }
 
+<<<<<<< HEAD
   // @authenticate({
   //   strategy: "auth",
   //   options: [ConfiguracionSeguridad.menuCiudadId, ConfiguracionSeguridad.guardarAccion]
   // })
+=======
+  @authenticate({
+    strategy: "auth",
+    options: [ConfiguracionSeguridad.menuCrearCiudadyDepartamentoId, ConfiguracionSeguridad.guardarAccion]
+  })
+>>>>>>> ed6f6e238f6bc31f41480f63e8f6c260f15dc09e
   @post('/ciudad')
   @response(200, {
     description: 'Ciudad model instance',

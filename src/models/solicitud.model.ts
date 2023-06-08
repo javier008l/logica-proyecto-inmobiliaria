@@ -73,6 +73,12 @@ export class Solicitud extends Entity {
     required: true,
   })
   fechaSolicitud: string;
+
+  @property({
+    type: 'string',
+    required: false,
+  })
+  motivoRechazo?: string;
   // @hasMany(() => Estado)
   // estados: Estado[];
 

@@ -29,10 +29,10 @@ export class DepartamentoController {
     public departamentoRepository: DepartamentoRepository,
   ) { }
 
-  // @authenticate({
-  //   strategy: "auth",
-  //   options: [ConfiguracionSeguridad.menuDepartamentoId, ConfiguracionSeguridad.guardarAccion]
-  // })
+  @authenticate({
+    strategy: "auth",
+    options: [ConfiguracionSeguridad.menuCrearCiudadyDepartamentoId, ConfiguracionSeguridad.guardarAccion]
+  })
   @post('/departamento')
   @response(200, {
     description: 'Departamento model instance',
@@ -170,13 +170,13 @@ export class DepartamentoController {
     })
     datos: NombreDepartamento,
   ): Promise<Number> {
-    let departamento = await this.departamentoRepository.findOne({
-      where:{
+    const departamento = await this.departamentoRepository.findOne({
+      where: {
         nombre: datos.nombreDepartamento
       }
     });
 
-    if(!departamento){
+    if (!departamento) {
       throw new HttpErrors.NotFound('No se encuentra el cliente');
     }
     return departamento.id as number;
