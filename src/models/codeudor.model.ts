@@ -12,47 +12,15 @@ export class Codeudor extends Entity {
 
   @property({
     type: 'string',
-    required: true,
+    required: true
   })
-  cartaLaboral: string;
+  documento: string;
 
   @property({
-    type: 'string',
-    required: true,
+    type: 'number',
+    required: true
   })
-  primerNombre: string;
-
-  @property({
-    type: 'string',
-  })
-  segundoNombre?: string;
-
-  @property({
-    type: 'string',
-    required: true,
-  })
-  primerApellido: string;
-
-  @property({
-    type: 'string',
-  })
-  segundoApellido?: string;
-
-  @property({
-    type: 'string',
-    required: true,
-  })
-  cedula: string;
-
-  @property({
-    type: 'string',
-  })
-  correo?: string;
-
-  @property({
-    type: 'string',
-  })
-  telefono?: string;
+  solicitudId: number;
 
   @hasMany(() => Solicitud)
   solicitudes: Solicitud[];

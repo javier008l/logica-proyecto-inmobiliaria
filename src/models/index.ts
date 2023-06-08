@@ -17,4 +17,8 @@ export * from './variables-generales-del-sistema.model';
 
 export * from './solicitudes-cliente.model';
 export * from './asesor-id.model';
+<<<<<<< HEAD
 export * from './paginador-cliente.model';
+=======
+export * from './nombre-departamento.model';
+>>>>>>> 8d919c9998fb3d5ed93f24e0c9a79af6787a177a
