@@ -300,12 +300,14 @@ export class SolicitudController {
             if (clienteRechazado) {
               try {
                 // Construir el mensaje de notificación
+
+
                 const asuntoRechazo = "Rechazo de su solicitud";
                 const mensajeRechazo = `Estimado/a ${clienteRechazado.primerNombre}, su solicitud ha sido rechazada,
-                porque el inmueble ya fue tomado por otro cliente, para más información, puede revisar en nuestra página web.
+                  porque el inmueble ya fue tomado por otro cliente, para más información, puede revisar en nuestra página web.
 
-                Hasta pronto,
-                Equipo Técnico`;
+                  Hasta pronto,
+                  Equipo Técnico`;
 
                 const datosClienteRechazado = {
                   correoDestino: clienteRechazado.correo,
@@ -319,6 +321,7 @@ export class SolicitudController {
                   datosClienteRechazado,
                   ConfiguracionNotificaciones.urlNotificacionesRechazoSolicitud
                 );
+
                 // notificar via Mensaje de texto
                 let datosSMS = {
                   numeroDestino: clienteRechazado.telefono,
@@ -349,12 +352,12 @@ export class SolicitudController {
             let asunto = "Cambio de estado en su solicitud"
 
             let mensaje = `<br>Estimado/a ${cliente.primerNombre}, el estado de su solicitud actualmente es:
-            ${estado.nombre}, para más información, puede revisar en nuestra pagina web.<br/>
+            ${estado.nombre}, ${datos.motivoRechazo}, para más información, puede revisar en nuestra pagina web.<br/>
 
 
-       <br> Hasta pronto,<br/>
-        Equipo Técnico,
-        `;
+            <br> Hasta pronto,<br/>
+            Equipo Técnico,
+            `;
 
             let datosCliente = {
               correoDestino: cliente.correo,
@@ -362,6 +365,9 @@ export class SolicitudController {
               asuntoCorreo: asunto,
               contenidoCorreo: mensaje
             };
+
+            solicitud.motivoRechazo = datos.motivoRechazo;
+            await this.solicitudRepository.updateById(datos.solicitudId, solicitud);
 
             let enviado = this.servicioNotificaciones.enviarNotificaciones(datosCliente, ConfiguracionNotificaciones.urlNotificacionesCambioEstadoSolicitud);
             console.log(enviado);
@@ -385,7 +391,7 @@ export class SolicitudController {
     return null;
   }
 
-  
+
 
 }
 
