@@ -260,8 +260,50 @@ export class SitioWebController {
     } else {
       throw new HttpErrors[500]("No se encuentra cliente")
     }
-
   }
+
+   // Metodo que muestra las solicitudes que tiene asesor
+   @post('/solicitudes-asesor')
+   @response(200, {
+     description: 'solicitudes del asesor',
+     content: {
+       'application/json': {
+         schema: {
+           type: 'array',
+           items: getModelSchemaRef(Solicitud, {includeRelations: true}),
+         },
+       },
+     },
+   })
+   async findBySolicitudAsesor(
+     @requestBody({
+       content: {
+         'application/json': {
+           schema: getModelSchemaRef(SolicitudesCliente),
+         },
+       },
+     })
+     datos: SolicitudesCliente,
+   ): Promise<Solicitud[]> {
+     let asesor = await this.respositorioAsesor.findOne({
+       where: {
+         correo: datos.correoCliente
+       }
+     })
+
+     const filter: Filter<Solicitud> = {
+       where: {
+         asesorId: asesor?.id,
+       },
+     };
+     if (filter) {
+       console.log("Este es el filter: "+ filter)
+       return this.repositorioSolicitud.find(filter);
+     } else {
+       throw new HttpErrors[500]("No se encuentra cliente")
+     }
+
+   }
 
 
 }

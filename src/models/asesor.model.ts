@@ -64,6 +64,13 @@ export class Asesor extends Entity {
   })
   inmuebleId?: number[];
 
+  @property({
+    type: 'array',
+    itemType: 'number',
+    required: false,
+  })
+  solicitudId?: number[];
+
   @hasMany(() => Solicitud)
   solicitudes: Solicitud[];
 

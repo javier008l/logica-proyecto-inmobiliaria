@@ -22,7 +22,7 @@ import {
 } from '@loopback/rest';
 import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
 import {ConfiguracionSeguridad} from '../config/configuracion.seguridad';
-import {Asesor, AsesorId, DatosAsignacionInmuebleAsesor, Inmueble, VariablesGeneralesDelSistema} from '../models';
+import {Asesor, AsesorId, DatosAsignacionInmuebleAsesor, Inmueble, Solicitud, VariablesGeneralesDelSistema} from '../models';
 import {AsesorRepository, InmuebleRepository, VariablesGeneralesDelSistemaRepository} from '../repositories';
 import {NotificacionService, SeguridadService} from '../services';
 
