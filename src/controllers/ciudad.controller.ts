@@ -30,7 +30,7 @@ export class CiudadController {
 
   @authenticate({
     strategy: "auth",
-    options: [ConfiguracionSeguridad.menuCiudadId, ConfiguracionSeguridad.guardarAccion]
+    options: [ConfiguracionSeguridad.menuCrearCiudadyDepartamentoId, ConfiguracionSeguridad.guardarAccion]
   })
   @post('/ciudad')
   @response(200, {

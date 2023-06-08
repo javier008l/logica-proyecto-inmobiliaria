@@ -31,7 +31,7 @@ export class DepartamentoController {
 
   @authenticate({
     strategy: "auth",
-    options: [ConfiguracionSeguridad.menuDepartamentoId, ConfiguracionSeguridad.guardarAccion]
+    options: [ConfiguracionSeguridad.menuCrearCiudadyDepartamentoId, ConfiguracionSeguridad.guardarAccion]
   })
   @post('/departamento')
   @response(200, {
@@ -171,12 +171,12 @@ export class DepartamentoController {
     datos: NombreDepartamento,
   ): Promise<Number> {
     let departamento = await this.departamentoRepository.findOne({
-      where:{
+      where: {
         nombre: datos.nombreDepartamento
       }
     });
 
-    if(!departamento){
+    if (!departamento) {
       throw new HttpErrors.NotFound('No se encuentra el cliente');
     }
     return departamento.id as number;
