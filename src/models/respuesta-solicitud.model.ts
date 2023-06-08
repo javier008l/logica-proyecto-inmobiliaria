@@ -14,6 +14,12 @@ export class RespuestaSolicitud extends Model {
   })
   estadoSolicitudId: number;
 
+  @property({
+    type: 'string',
+    required: false,
+  })
+  motivoRechazo: string;
+
   // Define well-known properties here
 
   // Indexer property to allow additional data

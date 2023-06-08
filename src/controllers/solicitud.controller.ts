@@ -304,8 +304,8 @@ export class SolicitudController {
                 const mensajeRechazo = `Estimado/a ${clienteRechazado.primerNombre}, su solicitud ha sido rechazada,
                 porque el inmueble ya fue tomado por otro cliente, para más información, puede revisar en nuestra página web.
 
-        Hasta pronto,
-        Equipo Técnico`;
+                Hasta pronto,
+                Equipo Técnico`;
 
                 const datosClienteRechazado = {
                   correoDestino: clienteRechazado.correo,
@@ -384,6 +384,8 @@ export class SolicitudController {
     }
     return null;
   }
+
+  
 
 }
 

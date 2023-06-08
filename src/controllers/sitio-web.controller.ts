@@ -4,9 +4,10 @@ import {service} from '@loopback/core';
 import {Filter, repository} from '@loopback/repository';
 import {HttpErrors, getModelSchemaRef, post, requestBody, response, get} from '@loopback/rest';
 import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
-import {Asesor, ContactoCliente, FormularioAsesor, FormularioContacto, Solicitud, SolicitudesCliente, VariablesGeneralesDelSistema} from '../models';
-import {AsesorRepository, ClienteRepository, InmuebleRepository, SolicitudRepository, VariablesGeneralesDelSistemaRepository} from '../repositories';
+import {Asesor, Codeudor, ContactoCliente, FormularioAsesor, FormularioContacto, Solicitud, SolicitudesCliente, VariablesGeneralesDelSistema} from '../models';
+import {AsesorRepository, ClienteRepository, CodeudorRepository, InmuebleRepository, SolicitudRepository, VariablesGeneralesDelSistemaRepository} from '../repositories';
 import {NotificacionService, SeguridadService} from '../services';
+import {RespuestaSolicitud} from '../models/respuesta-solicitud.model';
 
 // import {inject} from '@loopback/core';
 
@@ -26,7 +27,9 @@ export class SitioWebController {
     @repository(InmuebleRepository)
     private inmuebleRepositorio: InmuebleRepository,
     @repository(SolicitudRepository)
-    private repositorioSolicitud: SolicitudRepository
+    private repositorioSolicitud: SolicitudRepository,
+    @repository(CodeudorRepository)
+    private repositorioCodeudor: CodeudorRepository,
   ) {
   }
 
@@ -303,6 +306,38 @@ export class SitioWebController {
        throw new HttpErrors[500]("No se encuentra cliente")
      }
 
+   }
+
+   @post('/mostrar-codeudor')
+   @response(200, {
+     description: 'mostrar codeudor',
+     content: {'aplicacion/json': {schema: getModelSchemaRef(Codeudor)}},
+   })
+   async rechazarSolicitud(
+     @requestBody({
+       content: {
+         'application/json': {
+           schema: getModelSchemaRef(RespuestaSolicitud),
+         },
+       },
+     })
+     datos: RespuestaSolicitud,
+   ): Promise<object> {
+     try {
+       let codeudor = await this.repositorioCodeudor.findOne({
+         where: {
+           solicitudId: datos.solicitudId
+         }
+       })
+
+       if(codeudor){
+        return this.repositorioCodeudor.findById(codeudor.id)
+       }else {
+        throw new HttpErrors[500]("No se encuentra codeudor")
+      }
+     } catch {
+       throw new HttpErrors[500]("Error ------------")
+     }
    }
 
 
