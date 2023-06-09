@@ -168,6 +168,34 @@ export class SolicitudController {
     return this.solicitudRepository.find(filter);
   }
 
+  @authenticate({
+    strategy: "auth",
+    options: [ConfiguracionSeguridad.menuSolicitudId, ConfiguracionSeguridad.listarAccion]
+  })
+  @get('/solicitud-paginada')
+  @response(200, {
+    description: 'Array of Solicitud model instances',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Solicitud, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findToPaginacion(
+    @param.filter(Solicitud) filter?: Filter<Solicitud>,
+  ): Promise<object> {
+    let total: number = (await this.solicitudRepository.count()).count;
+    let registros: Solicitud[] = await this.solicitudRepository.find(filter);
+    let repuesta = {
+      registros: registros,
+      totalRegistros: total,
+    };
+    return repuesta;
+  }
+
   @patch('/solicitud')
   @response(200, {
     description: 'Solicitud PATCH success count',

@@ -1,5 +1,5 @@
 import {authenticate} from '@loopback/authentication';
-import {service} from '@loopback/core';
+import {inject, service} from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -20,8 +20,8 @@ import {
   response
 } from '@loopback/rest';
 import {ConfiguracionSeguridad} from '../config/configuracion.seguridad';
-import {Inmueble} from '../models';
-import {InmuebleRepository} from '../repositories';
+import {Asesor, Inmueble} from '../models';
+import {AsesorRepository, InmuebleRepository} from '../repositories';
 import {NotificacionService} from '../services';
 
 export class InmueblesController {
@@ -30,13 +30,17 @@ export class InmueblesController {
     public inmuebleRepository: InmuebleRepository,
     @service(NotificacionService)
     private servicioNotificaciones: NotificacionService,
+    @repository(AsesorRepository)
+    private asesorRepository: AsesorRepository,
 
   ) { }
 
-  @authenticate({
-    strategy: 'auth',
-    options: [ConfiguracionSeguridad.menuInmuebleId, ConfiguracionSeguridad.guardarAccion]
-  })
+  // @authenticate({
+  //   strategy: 'auth',
+  //   options: [ConfiguracionSeguridad.menuInmuebleId, ConfiguracionSeguridad.guardarAccion]
+  // })
+
+
   @post('/inmueble')
   @response(200, {
     description: 'Inmueble model instance',
@@ -53,9 +57,36 @@ export class InmueblesController {
         },
       },
     })
-    inmueble: Omit<Inmueble, 'id'>,
+    inmueble: Omit<Inmueble, 'id'>
   ): Promise<Inmueble> {
-    return this.inmuebleRepository.create(inmueble);
+    let asesor = await this.asesorRepository.findOne({
+      where: {
+        correo: inmueble.correoAsesor
+      }
+    })
+
+    if (!asesor) {
+      throw new Error('No se encontró ningún asesor con ese correo electrónico.');
+    }
+    if (!asesor.inmuebleId) {
+      asesor.inmuebleId = [];
+    }
+    const createdInmueble = await this.inmuebleRepository.create(inmueble);
+    const inmuebleId = createdInmueble.id;
+
+    let idAsesor = await this.asesorRepository.findById(asesor.id)
+    if (idAsesor.inmuebleId === null) {
+      idAsesor.inmuebleId = [];
+    }
+
+    if (inmuebleId !== undefined) {
+      asesor.inmuebleId.push(inmuebleId);
+      await this.asesorRepository.update(asesor);
+    } else {
+      console.log('No se generó un ID válido para el inmueble.');
+    }
+
+    return createdInmueble;
   }
 
   @get('/inmueble/count')
@@ -85,6 +116,35 @@ export class InmueblesController {
     @param.filter(Inmueble) filter?: Filter<Inmueble>,
   ): Promise<Inmueble[]> {
     return this.inmuebleRepository.find(filter);
+  }
+
+  @authenticate({
+    strategy: 'auth',
+    options: [ConfiguracionSeguridad.menuInmuebleId, ConfiguracionSeguridad.listarAccion]
+  })
+  @get('/inmueble-paginado')
+  @response(200, {
+    description: 'Array of Inmueble model instances',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Inmueble, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findPaginacion(
+    @param.filter(Inmueble) filter?: Filter<Inmueble>,
+
+  ): Promise<object> {
+    let total: number = (await this.inmuebleRepository.count()).count;
+    let registros: Inmueble[] = await this.inmuebleRepository.find(filter);
+    let repuesta = {
+      registros: registros,
+      totalRegistros: total,
+    };
+    return repuesta;
   }
 
   @patch('/inmueble')

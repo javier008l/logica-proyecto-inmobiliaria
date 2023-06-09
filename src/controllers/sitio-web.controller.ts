@@ -2,12 +2,12 @@
 
 import {service} from '@loopback/core';
 import {Filter, repository} from '@loopback/repository';
-import {HttpErrors, getModelSchemaRef, post, requestBody, response, get} from '@loopback/rest';
+import {HttpErrors, getModelSchemaRef, post, requestBody, response} from '@loopback/rest';
 import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
-import {Asesor, Codeudor, ContactoCliente, FormularioAsesor, FormularioContacto, Solicitud, SolicitudesCliente, VariablesGeneralesDelSistema} from '../models';
+import {Codeudor, ContactoCliente, FormularioAsesor, FormularioContacto, Solicitud, SolicitudesCliente, VariablesGeneralesDelSistema} from '../models';
+import {RespuestaSolicitud} from '../models/respuesta-solicitud.model';
 import {AsesorRepository, ClienteRepository, CodeudorRepository, InmuebleRepository, SolicitudRepository, VariablesGeneralesDelSistemaRepository} from '../repositories';
 import {NotificacionService, SeguridadService} from '../services';
-import {RespuestaSolicitud} from '../models/respuesta-solicitud.model';
 
 // import {inject} from '@loopback/core';
 
@@ -258,87 +258,87 @@ export class SitioWebController {
       },
     };
     if (filter) {
-      console.log("Este es el filter: "+ filter)
+      // console.log("Este es el filter: "+ filter)
       return this.repositorioSolicitud.find(filter);
     } else {
       throw new HttpErrors[500]("No se encuentra cliente")
     }
   }
 
-   // Metodo que muestra las solicitudes que tiene asesor
-   @post('/solicitudes-asesor')
-   @response(200, {
-     description: 'solicitudes del asesor',
-     content: {
-       'application/json': {
-         schema: {
-           type: 'array',
-           items: getModelSchemaRef(Solicitud, {includeRelations: true}),
-         },
-       },
-     },
-   })
-   async findBySolicitudAsesor(
-     @requestBody({
-       content: {
-         'application/json': {
-           schema: getModelSchemaRef(SolicitudesCliente),
-         },
-       },
-     })
-     datos: SolicitudesCliente,
-   ): Promise<Solicitud[]> {
-     let asesor = await this.respositorioAsesor.findOne({
-       where: {
-         correo: datos.correoCliente
-       }
-     })
+  // Metodo que muestra las solicitudes que tiene asesor
+  @post('/solicitudes-asesor')
+  @response(200, {
+    description: 'solicitudes del asesor',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Solicitud, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findBySolicitudAsesor(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(SolicitudesCliente),
+        },
+      },
+    })
+    datos: SolicitudesCliente,
+  ): Promise<Solicitud[]> {
+    let asesor = await this.respositorioAsesor.findOne({
+      where: {
+        correo: datos.correoCliente
+      }
+    })
 
-     const filter: Filter<Solicitud> = {
-       where: {
-         asesorId: asesor?.id,
-       },
-     };
-     if (filter) {
-       console.log("Este es el filter: "+ filter)
-       return this.repositorioSolicitud.find(filter);
-     } else {
-       throw new HttpErrors[500]("No se encuentra cliente")
-     }
+    const filter: Filter<Solicitud> = {
+      where: {
+        asesorId: asesor?.id,
+      },
+    };
+    if (filter) {
+      // console.log("Este es el filter: " + filter)
+      return this.repositorioSolicitud.find(filter);
+    } else {
+      throw new HttpErrors[500]("No se encuentra cliente")
+    }
 
-   }
+  }
 
-   @post('/mostrar-codeudor')
-   @response(200, {
-     description: 'mostrar codeudor',
-     content: {'aplicacion/json': {schema: getModelSchemaRef(Codeudor)}},
-   })
-   async rechazarSolicitud(
-     @requestBody({
-       content: {
-         'application/json': {
-           schema: getModelSchemaRef(RespuestaSolicitud),
-         },
-       },
-     })
-     datos: RespuestaSolicitud,
-   ): Promise<object> {
-     try {
-       let codeudor = await this.repositorioCodeudor.findOne({
-         where: {
-           solicitudId: datos.solicitudId
-         }
-       })
+  @post('/mostrar-codeudor')
+  @response(200, {
+    description: 'mostrar codeudor',
+    content: {'aplicacion/json': {schema: getModelSchemaRef(Codeudor)}},
+  })
+  async rechazarSolicitud(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(RespuestaSolicitud),
+        },
+      },
+    })
+    datos: RespuestaSolicitud,
+  ): Promise<object> {
+    try {
+      let codeudor = await this.repositorioCodeudor.findOne({
+        where: {
+          solicitudId: datos.solicitudId
+        }
+      })
 
-       if(codeudor){
+      if (codeudor) {
         return this.repositorioCodeudor.findById(codeudor.id)
-       }else {
+      } else {
         throw new HttpErrors[500]("No se encuentra codeudor")
       }
-     } catch {
-       throw new HttpErrors[500]("Error ------------")
-     }
-   }
+    } catch {
+      throw new HttpErrors[500]("Error ------------")
+    }
+  }
 
 
 }
