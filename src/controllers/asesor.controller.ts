@@ -23,7 +23,7 @@ import {
 import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
 import {ConfiguracionSeguridad} from '../config/configuracion.seguridad';
 import {Asesor, AsesorId, DatosAsignacionInmuebleAsesor, Inmueble, Solicitud, VariablesGeneralesDelSistema} from '../models';
-import {AsesorRepository, InmuebleRepository, VariablesGeneralesDelSistemaRepository} from '../repositories';
+import {AsesorRepository, InmuebleRepository, SolicitudRepository, VariablesGeneralesDelSistemaRepository} from '../repositories';
 import {NotificacionService, SeguridadService} from '../services';
 
 export class AsesorController {
@@ -39,7 +39,9 @@ export class AsesorController {
     @repository(VariablesGeneralesDelSistemaRepository)
     private variablesRepository: VariablesGeneralesDelSistemaRepository,
     @repository(InmuebleRepository)
-    private inmuebleRepository: InmuebleRepository
+    private inmuebleRepository: InmuebleRepository,
+    @repository(SolicitudRepository)
+    private solicitudRepository: SolicitudRepository,
   ) { }
 
   /**
@@ -491,9 +493,65 @@ export class AsesorController {
         },
       },
     });
-
     return inmuebles;
+  }
 
+  @post('/asignar-solicitud-asesor')
+  @response(200, {
+    description: 'se notifica al asesor que se le asigno un inmueble y se guarda en base de datos',
+    content: {'aplicacion/json': {schema: getModelSchemaRef(Solicitud)}},
+  })
+  async asignarSolicitud(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(DatosAsignacionInmuebleAsesor),
+        },
+      },
+    })
+    datos: DatosAsignacionInmuebleAsesor,
+  ): Promise<Object> {
+    try {
+      const asesor = await this.repositorioAsesor.findOne({
+        where: {
+          id: datos.idAsesor
+        }
+      })
+      if (asesor) {
+        const correoAsesor = asesor.correo;
+        const nombreAsesor = asesor.primerNombre;
+        const asunto = "Asignación de solicitud asesor";
+        const mensaje = `Estimado/a ${asesor.primerNombre}, se le ha asigando una solicitud.
+
+        Id del nuevo inmueble:${datos.idInmueble} ,
+
+
+
+        Hasta pronto,
+        Equipo Técnico,
+        `;
+        const datosContacto = {
+          correoDestino: correoAsesor,
+          nombreDestino: nombreAsesor,
+          asuntoCorreo: asunto,
+          contenidoCorreo: mensaje
+
+        };
+
+        await this.solicitudRepository.updateById(datos.idInmueble, { asesorId: datos.idAsesor });
+
+
+        const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
+        console.log(enviado);
+        return enviado;
+      } else {
+        console.log("no se contro ninguna asesor con ese id:");
+        return datos.idAsesor;
+      }
+    } catch (err) {
+      console.log("El error es: " + err)
+      throw new HttpErrors[500]("Error de servidor para enviar mensaje")
+    }
   }
 
 }
