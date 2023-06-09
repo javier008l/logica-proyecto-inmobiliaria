@@ -86,10 +86,10 @@ export class ClienteController {
     return this.clienteRepository.count(where);
   }
 
-  // @authenticate({
-  //   strategy: "auth",
-  //   options: [ConfiguracionSeguridad.menuClienteId, ConfiguracionSeguridad.listarAccion]
-  // })
+  @authenticate({
+    strategy: "auth",
+    options: [ConfiguracionSeguridad.menuClienteId, ConfiguracionSeguridad.listarAccion]
+  })
   @get('/cliente')
   @response(200, {
     description: 'Array of Cliente model instances',
