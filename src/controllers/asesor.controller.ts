@@ -181,6 +181,30 @@ export class AsesorController {
     return this.asesorRepository.find(filter);
   }
 
+  @get('/asesor-paginado')
+  @response(200, {
+    description: 'Array of Asesor model instances',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Asesor, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findToPaginacion(
+    @param.filter(Asesor) filter?: Filter<Asesor>,
+  ): Promise<object> {
+    let total: number = (await this.asesorRepository.count()).count;
+    let registros: Asesor[] = await this.asesorRepository.find(filter);
+    let repuesta = {
+      registros: registros,
+      totalRegistros: total,
+    };
+    return repuesta;
+  }
+
   @patch('/asesor')
   @response(200, {
     description: 'Asesor PATCH success count',
@@ -478,8 +502,8 @@ export class AsesorController {
     datos: AsesorId,
   ): Promise<Inmueble[]> {
     let asesor = await this.asesorRepository.findOne({
-      where:{
-        correo : datos.correoAsesor
+      where: {
+        correo: datos.correoAsesor
       }
     });
 
@@ -538,7 +562,7 @@ export class AsesorController {
 
         };
 
-        await this.solicitudRepository.updateById(datos.idInmueble, { asesorId: datos.idAsesor });
+        await this.solicitudRepository.updateById(datos.idInmueble, {asesorId: datos.idAsesor});
 
 
         const enviado = this.servicioNotificaciones.enviarNotificaciones(datosContacto, ConfiguracionNotificaciones.urlNotificaciones2fa);
