@@ -118,6 +118,35 @@ export class InmueblesController {
     return this.inmuebleRepository.find(filter);
   }
 
+  @authenticate({
+    strategy: 'auth',
+    options: [ConfiguracionSeguridad.menuInmuebleId, ConfiguracionSeguridad.listarAccion]
+  })
+  @get('/inmueble-paginado')
+  @response(200, {
+    description: 'Array of Inmueble model instances',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Inmueble, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findPaginacion(
+    @param.filter(Inmueble) filter?: Filter<Inmueble>,
+
+  ): Promise<object> {
+    let total: number = (await this.inmuebleRepository.count()).count;
+    let registros: Inmueble[] = await this.inmuebleRepository.find(filter);
+    let repuesta = {
+      registros: registros,
+      totalRegistros: total,
+    };
+    return repuesta;
+  }
+
   @patch('/inmueble')
   @response(200, {
     description: 'Inmueble PATCH success count',

@@ -14,7 +14,6 @@ import path from 'path';
 import {promisify} from 'util';
 import {ConfiguracionGeneral} from '../config/configuracion.general';
 
-import {authenticate} from '@loopback/authentication';
 import fs from 'fs';
 const readdir = promisify(fs.readdir);
 
@@ -22,7 +21,7 @@ const readdir = promisify(fs.readdir);
 export class AdministradorDeArchivosController {
   constructor() { }
 
-  @authenticate('admin')
+  // @authenticate('admin')
   @post('/cargar-archivo-inmueble', {
     responses: {
       200: {

@@ -72,7 +72,7 @@ export class Solicitud extends Entity {
     type: 'date',
     required: true,
   })
-  fechaSolicitud: string;
+  fechaSolicitud: Date;
 
   @property({
     type: 'string',
