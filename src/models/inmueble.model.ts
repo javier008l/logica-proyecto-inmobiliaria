@@ -62,6 +62,21 @@ export class Inmueble extends Entity {
   foto?: string;
 
   @property({
+    type: 'string',
+  })
+  foto1?: string;
+
+  @property({
+    type: 'string',
+  })
+  foto2?: string;
+
+  @property({
+    type: 'string',
+  })
+  foto3?: string;
+
+  @property({
     type: 'Date',
   })
   fecha?: Date;
