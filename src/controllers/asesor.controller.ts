@@ -619,4 +619,39 @@ export class AsesorController {
     }
   }
 
+  @post('/id-asesor')
+  @response(200, {
+    description: 'devolver el id del asesor cuando tengo el correo',
+    content: {
+      'application/json': {
+        schema: {
+          type: '',
+          items: getModelSchemaRef(Asesor),
+        },
+      },
+    },
+  })
+  async idAsesor(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(AsesorId),
+        },
+      },
+    })
+    datos: AsesorId,
+  ): Promise<number> {
+    let asesor = await this.asesorRepository.findOne({
+      where: {
+        correo: datos.correoAsesor
+      }
+    });
+
+    if (asesor) {
+      let idAsesor = asesor.id;
+      return idAsesor!;
+    }
+    return null!
+  }
+
 }
