@@ -4,10 +4,11 @@ import {service} from '@loopback/core';
 import {Filter, repository} from '@loopback/repository';
 import {HttpErrors, getModelSchemaRef, post, requestBody, response} from '@loopback/rest';
 import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
-import {Codeudor, ContactoCliente, FormularioAsesor, FormularioContacto, Solicitud, SolicitudesCliente, VariablesGeneralesDelSistema} from '../models';
+import {Codeudor, ContactoCliente, FormularioAsesor, FormularioContacto, Inmueble, Solicitud, SolicitudesCliente, VariablesGeneralesDelSistema} from '../models';
 import {RespuestaSolicitud} from '../models/respuesta-solicitud.model';
 import {AsesorRepository, ClienteRepository, CodeudorRepository, InmuebleRepository, SolicitudRepository, VariablesGeneralesDelSistemaRepository} from '../repositories';
 import {NotificacionService, SeguridadService} from '../services';
+import Module from 'module';
 
 // import {inject} from '@loopback/core';
 
@@ -340,5 +341,6 @@ export class SitioWebController {
     }
   }
 
-
 }
+
+

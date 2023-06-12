@@ -213,4 +213,39 @@ export class ClienteController {
     return cliente.id as number;
   }
 
+  @post('/id-cliente')
+  @response(200, {
+    description: 'devolver el id del asesor cuando tengo el correo',
+    content: {
+      'application/json': {
+        schema: {
+          type: '',
+          items: getModelSchemaRef(Cliente),
+        },
+      },
+    },
+  })
+  async idAsesor(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(AsesorId),
+        },
+      },
+    })
+    datos: AsesorId,
+  ): Promise<number> {
+    let cliente = await this.clienteRepository.findOne({
+      where: {
+        correo: datos.correoAsesor
+      }
+    });
+
+    if (cliente) {
+      let idCliente = cliente.id;
+      return idCliente!;
+    }
+    return null!
+  }
+
 }
