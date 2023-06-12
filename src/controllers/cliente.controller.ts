@@ -215,7 +215,7 @@ export class ClienteController {
 
   @post('/id-cliente')
   @response(200, {
-    description: 'devolver el id del asesor cuando tengo el correo',
+    description: 'devolver el id del cliente cuando tengo el correo',
     content: {
       'application/json': {
         schema: {
@@ -225,7 +225,7 @@ export class ClienteController {
       },
     },
   })
-  async idAsesor(
+  async idCliente(
     @requestBody({
       content: {
         'application/json': {
