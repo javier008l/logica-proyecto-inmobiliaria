@@ -6,6 +6,7 @@ export * from './codeudor.model';
 export * from './contacto-cliente.model';
 export * from './contrato.model';
 export * from './datos-asignacion-inmueble-asesor.model';
+export * from './datos-asignacion-solicitud-asesor.model';
 export * from './departamento.model';
 export * from './estado.model';
 export * from './formulario-asesor.model';
@@ -18,5 +19,4 @@ export * from './solicitudes-cliente.model';
 export * from './tipo-inmueble.model';
 export * from './tipo-solicitud.model';
 export * from './variables-generales-del-sistema.model';
-
 
