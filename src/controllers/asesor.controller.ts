@@ -376,7 +376,7 @@ export class AsesorController {
         const asunto = "Eliminación de inmuble asesor";
         const mensaje = `Estimado/a ${asesor.primerNombre}, se le ha eliminado un inmueble.
 
-        Id del nuevo inmueble:${datos.idInmueble} ,
+        Id del inmueble eliminado es:${datos.idInmueble} ,
 
 
 
@@ -534,28 +534,60 @@ export class AsesorController {
       },
     })
     datos: DatosAsignacionSolicitudAsesor,
-  ): Promise<Object> {
+  ): Promise<boolean> {
     try {
-      const asesor = await this.repositorioAsesor.findOne({
-        where: {
-          id: datos.asesorNuevoId
+      let asesorNuevo = await this.repositorioAsesor.findById(datos.asesorNuevoId);
+      let solicitud = await this.solicitudRepository.findById(datos.solicitudId);
+      let asesorActual = await this.repositorioAsesor.findById(datos.asesorActualId);
+
+      if (asesorNuevo) {
+        // Eliminar la solicitud asignada al asesor actual
+        const index = asesorActual.solicitudId!.indexOf(datos.solicitudId);
+
+        if (index > -1) {
+          asesorActual.solicitudId!.splice(index, 1);
         }
-      })
-      let idAsesor = await this.repositorioAsesor.findById(datos.asesorNuevoId)
-      if (idAsesor.solicitudId === null) {
-        idAsesor.solicitudId = [];
+        await this.repositorioAsesor.update(asesorActual);
+
+        const correoAsesorActual = asesorActual.correo;
+        const nombreAsesorActual = asesorActual.primerNombre;
+        const asuntoActual = "Eliminación de solicitud asesor";
+        const mensajeActual = `Estimado/a ${nombreAsesorActual}, se le ha
+        eliminado la solicitud con ID: ${datos.solicitudId}.
+
+        Hasta pronto,
+        Equipo Técnico`;
+
+        const datosContactoActual = {
+          correoDestino: correoAsesorActual,
+          nombreDestino: nombreAsesorActual,
+          asuntoCorreo: asuntoActual,
+          contenidoCorreo: mensajeActual,
+        };
+
+        await this.servicioNotificaciones.enviarNotificaciones(datosContactoActual, ConfiguracionNotificaciones.urlNotificaciones2fa);
+
       }
-      if (idAsesor && idAsesor.solicitudId) {
-        idAsesor.solicitudId.push(datos.solicitudId);
-        await this.repositorioAsesor.update(idAsesor);
+
+      if (asesorNuevo.solicitudId === null) {
+        asesorNuevo.solicitudId = [];
+      }
+      if (asesorNuevo && asesorNuevo.solicitudId) {
+        asesorNuevo.solicitudId.push(datos.solicitudId);
+        await this.repositorioAsesor.update(asesorNuevo);
+
+        solicitud.asesorId = datos.asesorNuevoId;
+        await this.solicitudRepository.update(solicitud);
+
+
       } else {
         console.log("no se encontro el asesor");
       }
-      if (asesor) {
-        const correoAsesor = asesor.correo;
-        const nombreAsesor = asesor.primerNombre;
+      if (asesorNuevo) {
+        const correoAsesor = asesorNuevo.correo;
+        const nombreAsesor = asesorNuevo.primerNombre;
         const asunto = "Asignación de solicitud asesor";
-        const mensaje = `Estimado/a ${asesor.primerNombre}, se le ha asigando una solicitud.
+        const mensaje = `Estimado/a ${asesorNuevo.primerNombre}, se le ha asigando una solicitud.
 
         Id de la nueva solicitud es:${datos.solicitudId} ,
 
@@ -577,15 +609,14 @@ export class AsesorController {
         return enviado;
       } else {
         console.log("no se contro ninguna asesor con ese id:");
-        return datos.asesorNuevoId;
+        return false;
       }
     } catch (err) {
       console.log("El error es: " + err)
       throw new HttpErrors[500]("Error de servidor para enviar mensaje")
+    } finally {
+
     }
   }
-
-
-
 
 }
