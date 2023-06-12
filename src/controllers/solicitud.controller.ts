@@ -41,12 +41,14 @@ export class SolicitudController {
     public estadoRepositorio: EstadoRepository,
     @service(NotificacionService)
     private servicioNotificaciones: NotificacionService,
+    @repository(AsesorRepository)
+    private asesorRepository: AsesorRepository,
   ) { }
 
-  @authenticate({
-    strategy: "auth",
-    options: [ConfiguracionSeguridad.menuSolicitudId, ConfiguracionSeguridad.guardarAccion]
-  })
+  // @authenticate({
+  //   strategy: "auth",
+  //   options: [ConfiguracionSeguridad.menuSolicitudId, ConfiguracionSeguridad.guardarAccion]
+  // })
   @post('/solicitud')
   @response(200, {
     description: 'Solicitud model instance',
@@ -65,7 +67,6 @@ export class SolicitudController {
     })
     solicitud: Omit<Solicitud, 'id'>,
   ): Promise<Solicitud> {
-
     // Notificar al cliente y al asesor de una nueva solicitud
     solicitud.estadoId = 1;
     let inmueble = await this.inmuebleRepositorio.findOne({
@@ -129,6 +130,35 @@ export class SolicitudController {
             };
             let enviado2 = this.servicioNotificaciones.enviarNotificaciones(datosAsesor, ConfiguracionNotificaciones.urlNotificacionesNuevaSolicitudAsesor);
             console.log(enviado2);
+
+            let asesor2 = await this.asesorRepository.findOne({
+              where: {
+                id: solicitud.asesorId
+              }
+            })
+
+            if (!asesor2) {
+              throw new Error('No se encontró ningún asesor con ese correo electrónico.');
+            }
+            if (!asesor2.solicitudId) {
+              asesor2.solicitudId = [];
+            }
+            const createdSolicitud = await this.solicitudRepository.create(solicitud);
+            const solicitudId = createdSolicitud.id;
+
+            let idAsesor = await this.asesorRepository.findById(asesor2.id)
+            if (idAsesor.solicitudId === null) {
+              idAsesor.solicitudId = [];
+            }
+
+            if (solicitudId !== undefined) {
+              asesor2.solicitudId.push(solicitudId);
+              await this.asesorRepository.update(asesor2);
+            } else {
+              console.log('No se generó un ID válido para el inmueble.');
+            }
+
+            return createdSolicitud;
           } catch {
             throw new HttpErrors[500]("Error de servidor para enviar mensaje")
           }
