@@ -2,13 +2,12 @@
 
 import {service} from '@loopback/core';
 import {Filter, repository} from '@loopback/repository';
-import {HttpErrors, get, getModelSchemaRef, post, requestBody, response} from '@loopback/rest';
+import {HttpErrors, getModelSchemaRef, post, requestBody, response} from '@loopback/rest';
 import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
-import {Codeudor, ContactoCliente, Conteos, FormularioAsesor, FormularioContacto, Inmueble, Solicitud, SolicitudesCliente, VariablesGeneralesDelSistema} from '../models';
+import {Codeudor, ContactoCliente, Conteos, FormularioAsesor, FormularioContacto, Solicitud, SolicitudesCliente, VariablesGeneralesDelSistema} from '../models';
 import {RespuestaSolicitud} from '../models/respuesta-solicitud.model';
 import {AsesorRepository, ClienteRepository, CodeudorRepository, InmuebleRepository, SolicitudRepository, VariablesGeneralesDelSistemaRepository} from '../repositories';
 import {NotificacionService, SeguridadService} from '../services';
-import Module from 'module';
 
 // import {inject} from '@loopback/core';
 
@@ -56,7 +55,7 @@ export class SitioWebController {
       if ((variables).length === 0) {
         throw new HttpErrors[500]("No hay variables del sistema para realizar el proceso");
       }
-      let cliente = await this.clienteRepositorio.findOne({
+      const cliente = await this.clienteRepositorio.findOne({
         where: {
           correo: datos.correo
         }
@@ -172,12 +171,12 @@ export class SitioWebController {
     datos: ContactoCliente,
   ): Promise<boolean> {
     try {
-      let cliente = await this.clienteRepositorio.findOne({
+      const cliente = await this.clienteRepositorio.findOne({
         where: {
           correo: datos.correoCliente
         }
       })
-      let asesor = await this.respositorioAsesor.findOne({
+      const asesor = await this.respositorioAsesor.findOne({
         where: {
           correo: datos.correoAsesor
         }
@@ -249,7 +248,7 @@ export class SitioWebController {
     })
     datos: SolicitudesCliente,
   ): Promise<Solicitud[]> {
-    let cliente = await this.clienteRepositorio.findOne({
+    const cliente = await this.clienteRepositorio.findOne({
       where: {
         correo: datos.correoCliente
       }
@@ -291,7 +290,7 @@ export class SitioWebController {
     })
     datos: SolicitudesCliente,
   ): Promise<Solicitud[]> {
-    let asesor = await this.respositorioAsesor.findOne({
+    const asesor = await this.respositorioAsesor.findOne({
       where: {
         correo: datos.correoCliente
       }
@@ -327,14 +326,14 @@ export class SitioWebController {
     datos: RespuestaSolicitud,
   ): Promise<object> {
     try {
-      let codeudor = await this.repositorioCodeudor.findOne({
+      const codeudor = await this.repositorioCodeudor.findOne({
         where: {
           solicitudId: datos.solicitudId
         }
       })
 
       if (codeudor) {
-        return this.repositorioCodeudor.findById(codeudor.id)
+        return await this.repositorioCodeudor.findById(codeudor.id)
       } else {
         throw new HttpErrors[500]("No se encuentra codeudor")
       }
@@ -343,7 +342,7 @@ export class SitioWebController {
     }
   }
 
-  @get('/total', {
+  @post('/total', {
     responses: {
       '200': {
         description: 'Total records count',
@@ -381,7 +380,7 @@ export class SitioWebController {
       const solicitudes = await this.solicitudRepository.count();
       return {solicitudes};
     }
-    return { mensaje: "No es un nombre válido para hacer conteo" };
+    return {mensaje: "No es un nombre válido para hacer conteo"};
 
   }
 
