@@ -2,9 +2,9 @@
 
 import {service} from '@loopback/core';
 import {Filter, repository} from '@loopback/repository';
-import {HttpErrors, getModelSchemaRef, post, requestBody, response} from '@loopback/rest';
+import {HttpErrors, get, getModelSchemaRef, post, requestBody, response} from '@loopback/rest';
 import {ConfiguracionNotificaciones} from '../config/configuracion.notificaciones';
-import {Codeudor, ContactoCliente, FormularioAsesor, FormularioContacto, Inmueble, Solicitud, SolicitudesCliente, VariablesGeneralesDelSistema} from '../models';
+import {Codeudor, ContactoCliente, Conteos, FormularioAsesor, FormularioContacto, Inmueble, Solicitud, SolicitudesCliente, VariablesGeneralesDelSistema} from '../models';
 import {RespuestaSolicitud} from '../models/respuesta-solicitud.model';
 import {AsesorRepository, ClienteRepository, CodeudorRepository, InmuebleRepository, SolicitudRepository, VariablesGeneralesDelSistemaRepository} from '../repositories';
 import {NotificacionService, SeguridadService} from '../services';
@@ -31,6 +31,8 @@ export class SitioWebController {
     private repositorioSolicitud: SolicitudRepository,
     @repository(CodeudorRepository)
     private repositorioCodeudor: CodeudorRepository,
+    @repository(SolicitudRepository)
+    public solicitudRepository: SolicitudRepository,
   ) {
   }
 
@@ -339,6 +341,48 @@ export class SitioWebController {
     } catch {
       throw new HttpErrors[500]("Error ------------")
     }
+  }
+
+  @get('/total', {
+    responses: {
+      '200': {
+        description: 'Total records count',
+        content: {
+          'application/json': {
+            schema: {type: 'object', properties: {count: {type: 'number'}}},
+          },
+        },
+      },
+    },
+  })
+  async getTotalConteos(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(Conteos),
+        },
+      },
+    })
+    datos: Conteos
+  ): Promise<object> {
+    if (datos.nombre === "asesor") {
+      const asesores = await this.respositorioAsesor.count();
+      return {asesores};
+    }
+    if (datos.nombre === "cliente") {
+      const clientes = await this.clienteRepositorio.count();
+      return {clientes};
+    }
+    if (datos.nombre === "inmueble") {
+      const inmuebles = await this.inmuebleRepositorio.count();
+      return {inmuebles};
+    }
+    if (datos.nombre === "solicitud") {
+      const solicitudes = await this.solicitudRepository.count();
+      return {solicitudes};
+    }
+    return { mensaje: "No es un nombre válido para hacer conteo" };
+
   }
 
 }
