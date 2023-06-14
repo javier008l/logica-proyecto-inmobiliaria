@@ -35,10 +35,10 @@ export class InmueblesController {
 
   ) { }
 
-  // @authenticate({
-  //   strategy: 'auth',
-  //   options: [ConfiguracionSeguridad.menuInmuebleId, ConfiguracionSeguridad.guardarAccion]
-  // })
+  @authenticate({
+    strategy: 'auth',
+    options: [ConfiguracionSeguridad.menuInmuebleId, ConfiguracionSeguridad.guardarAccion]
+  })
 
 
   @post('/inmueble')
@@ -217,6 +217,18 @@ export class InmueblesController {
   })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.inmuebleRepository.deleteById(id);
+
+        // Eliminar el id de solicitud del campo solicitudid del modelo Asesor
+  const asesores = await this.asesorRepository.find(); // Obtener todos los asesores
+  for (const asesor of asesores) {
+    // Verificar si el id de la solicitud está presente en el campo solicitudid del asesor
+    if (asesor.inmuebleId!.includes(id)) {
+      // Eliminar el id de la solicitud del campo solicitudid del asesor
+      const index = asesor.inmuebleId!.indexOf(id);
+      asesor.inmuebleId!.splice(index, 1);
+      await this.asesorRepository.update(asesor); // Guardar los cambios en el asesor
+    }
+  }
   }
 
 

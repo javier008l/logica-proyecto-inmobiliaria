@@ -296,6 +296,18 @@ export class SolicitudController {
   })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.solicitudRepository.deleteById(id);
+
+      // Eliminar el id de solicitud del campo solicitudid del modelo Asesor
+  const asesores = await this.asesorRepository.find(); // Obtener todos los asesores
+  for (const asesor of asesores) {
+    // Verificar si el id de la solicitud está presente en el campo solicitudid del asesor
+    if (asesor.solicitudId!.includes(id)) {
+      // Eliminar el id de la solicitud del campo solicitudid del asesor
+      const index = asesor.solicitudId!.indexOf(id);
+      asesor.solicitudId!.splice(index, 1);
+      await this.asesorRepository.update(asesor); // Guardar los cambios en el asesor
+    }
+  }
   }
 
   // Notficar el estado de la solicitud y si alguna es aceptada que se rechace automaticamente
